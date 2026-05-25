@@ -136,7 +136,9 @@ function CheckoutPage() {
 
   const goBack = () => {
     if (step === 1) navigate({ to: "/carrinho" });
-    else setStep(1);
+    else if (step === 2) setStep(1);
+    else if (step === 3) setStep(2);
+    else setStep(3);
   };
 
   const addBump = (b: Bump, variant: string) => {
@@ -156,7 +158,6 @@ function CheckoutPage() {
     setVariantModal(b);
   };
 
-  // Build interleaved list: cart items first, then bumps not yet in cart
   const cartItems = items;
   const bumpsToShow = BUMPS.filter(
     (b) => !items.some((i) => i.id === b.id || i.id.startsWith(b.id + "-")),
@@ -184,20 +185,18 @@ function CheckoutPage() {
           </div>
           <div className="w-5" />
         </div>
+        {step >= 2 && step <= 4 && (
+          <div className="max-w-3xl mx-auto px-6 pb-3">
+            <StepIndicator current={step} />
+          </div>
+        )}
       </header>
 
       <main className="max-w-3xl mx-auto px-3 pt-3">
         {step === 1 && (
           <Step1
             cartItems={cartItems}
-            bumpsToShow={bumpsToShow}
             updateQty={updateQty}
-            onBumpClick={handleBumpClick}
-            getBumpCount={(b) =>
-              items
-                .filter((i) => i.id === b.id || i.id.startsWith(b.id + "-"))
-                .reduce((s, i) => s + i.qty, 0)
-            }
           />
         )}
         {step === 2 && (
@@ -205,8 +204,23 @@ function CheckoutPage() {
             initial={customer}
             onNext={(c) => {
               setCustomer(c);
-              setStep(4);
+              setStep(3);
             }}
+          />
+        )}
+        {step === 3 && (
+          <Step3
+            bumpsToShow={bumpsToShow}
+            onBumpClick={handleBumpClick}
+            getBumpCount={(b) =>
+              items
+                .filter((i) => i.id === b.id || i.id.startsWith(b.id + "-"))
+                .reduce((s, i) => s + i.qty, 0)
+            }
+            onContinue={() => setStep(4)}
+            totalFinal={totalFinal}
+            descontos={descontos}
+            itemsCount={items.length}
           />
         )}
         {step === 4 && <Step4 customer={customer} totalFinal={totalFinal} />}
