@@ -163,7 +163,8 @@ function ProdutoPage() {
           </div>
           <div className="flex flex-col items-end">
             <div className="flex items-center gap-1 text-white text-[11px] font-semibold">
-              ⚡ Oferta Relâmpago
+              <img src={iconRaio} alt="" width={11} height={11} style={{ filter: "brightness(0) invert(1)" }} />
+              Oferta Relâmpago
             </div>
             <span className="text-white/90 text-xs font-semibold mt-0.5">Termina em 04:43</span>
           </div>
@@ -185,7 +186,7 @@ function ProdutoPage() {
         <div className="flex justify-between items-start gap-3">
           <h1 className="flex-1 text-base font-semibold leading-tight">{product.name}</h1>
           <button onClick={() => setSaved((v) => !v)} aria-label="Salvar" className="p-1">
-            <img src={setaCima} alt="" width={22} height={22} className={saved ? "opacity-100" : "opacity-60"} />
+            <img src={iconSave} alt="" width={22} height={22} className={saved ? "opacity-100" : "opacity-60"} style={saved ? { filter: "invert(57%) sepia(95%) saturate(2493%) hue-rotate(326deg) brightness(96%) contrast(101%)" } : undefined} />
           </button>
         </div>
         <div className="flex items-center gap-1 mt-1">
