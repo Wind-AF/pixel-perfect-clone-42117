@@ -1,45 +1,15 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ChevronLeft, Search, ChevronRight, List, ArrowDownAZ } from "lucide-react";
 import logo from "@/assets/logo.webp";
-import env100 from "@/assets/envelopes-100.png";
-import env200 from "@/assets/envelopes-200.png";
-import env400 from "@/assets/envelopes-400.png";
-import env650 from "@/assets/envelopes-650.png";
-import albumOuro650 from "@/assets/album-ouro-650.png";
-import albumPrata from "@/assets/album-capa-dura.png";
-import albumOuro from "@/assets/album-capa-dura-ouro.png";
-import albumColor from "@/assets/album-capa-dura-color.png";
-import albumBrochura from "@/assets/album-brochura.png";
 import bilhete from "@/assets/bilhete.png";
 import carrinho from "@/assets/carrinho.png";
 import compartilhar from "@/assets/compartilhar.png";
+import { products } from "@/data/products";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
-
-type Product = {
-  name: string;
-  img: string;
-  price: string;
-  old: string;
-  discount: string;
-  sold: string;
-  rating: string;
-};
-
-const products: Product[] = [
-  { name: "Kit Com 650 Envelopes", img: env650, price: "R$ 62,06", old: "R$ 494,90", discount: "60% OFF", sold: "4312 vendido(s)", rating: "5" },
-  { name: "Kit Com 400 Envelopes", img: env400, price: "R$ 43,08", old: "R$ 394,90", discount: "60% OFF", sold: "4312 vendido(s)", rating: "5" },
-  { name: "Álbum 2026", img: albumOuro650, price: "R$ 31,43", old: "R$ 74,90", discount: "60% OFF", sold: "4312 vendido(s)", rating: "5" },
-  { name: "Kit Com 200 Envelopes", img: env200, price: "R$ 29,93", old: "R$ 194,90", discount: "60% OFF", sold: "4312 vendido(s)", rating: "5" },
-  { name: "Álbum Dourado Capa Dura", img: albumOuro, price: "R$ 25,31", old: "R$ 74,90", discount: "60% OFF", sold: "4312 vendido(s)", rating: "5" },
-  { name: "Álbum Prata Capa Dura", img: albumPrata, price: "R$ 24,08", old: "R$ 74,90", discount: "60% OFF", sold: "4312 vendido(s)", rating: "5" },
-  { name: "Kit Com 100 Envelopes", img: env100, price: "R$ 21,05", old: "R$ 74,90", discount: "60% OFF", sold: "4312 vendido(s)", rating: "5" },
-  { name: "Álbum Tradicional Capa Dura", img: albumColor, price: "R$ 20,77", old: "R$ 74,90", discount: "60% OFF", sold: "4312 vendido(s)", rating: "5" },
-  { name: "Álbum Tradicional Capa Mole", img: albumBrochura, price: "R$ 14,29", old: "R$ 74,90", discount: "60% OFF", sold: "4312 vendido(s)", rating: "5" },
-];
 
 const tabs = ["Página inicial", "Produtos", "Categorias"] as const;
 const filters = ["Recomendado", "Mais vendidos", "Lançamentos"] as const;
@@ -47,6 +17,7 @@ const filters = ["Recomendado", "Mais vendidos", "Lançamentos"] as const;
 function Index() {
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>("Produtos");
   const [activeFilter, setActiveFilter] = useState<(typeof filters)[number]>("Recomendado");
+  const [following, setFollowing] = useState(false);
 
   return (
     <div className="min-h-screen bg-white text-gray-800 text-sm max-w-[500px] mx-auto shadow-sm">
@@ -89,7 +60,16 @@ function Index() {
             </div>
           </div>
           <div className="flex flex-col items-end gap-2">
-            <button className="w-[92px] px-4 py-1.5 bg-rose-600 text-white text-xs font-semibold rounded-md shadow-sm">Seguir</button>
+            <button
+              onClick={() => setFollowing((v) => !v)}
+              className={`w-[92px] px-4 py-1.5 text-xs font-semibold rounded-md shadow-sm transition-colors ${
+                following
+                  ? "bg-gray-100 text-gray-700 border border-gray-200"
+                  : "bg-rose-600 text-white"
+              }`}
+            >
+              {following ? "Seguindo" : "Seguir"}
+            </button>
             <button className="w-[92px] px-4 py-1.5 border border-gray-200 text-xs font-semibold rounded-md">Mensagem</button>
           </div>
         </div>
@@ -179,14 +159,14 @@ function Index() {
 
       {/* Product list */}
       <main className="p-3 space-y-4 bg-white">
-        {products.map((p, idx) => (
-          <article key={idx} className="w-full bg-white flex flex-row rounded-lg">
-            <div className="flex-shrink-0 mr-3 w-[110px] h-[120px]">
+        {products.map((p) => (
+          <article key={p.id} className="w-full bg-white flex flex-row rounded-lg">
+            <Link to="/produto/$id" params={{ id: p.id }} className="flex-shrink-0 mr-3 w-[110px] h-[120px]">
               <img src={p.img} alt={p.name} loading="lazy" className="w-full h-full object-contain" />
-            </div>
+            </Link>
             <div className="flex flex-col justify-between flex-1 min-w-0 pb-2 min-h-[120px]">
               <div className="flex flex-col gap-1">
-                <h2 className="text-gray-900 text-xs font-semibold truncate">{p.name}</h2>
+                <Link to="/produto/$id" params={{ id: p.id }} className="text-gray-900 text-xs font-semibold truncate">{p.name}</Link>
                 <div className="flex flex-row gap-1 items-center flex-wrap">
                   <span className="bg-rose-100 text-rose-600 text-[11px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
                     <img src={bilhete} alt="" width={12} height={12} style={{ filter: "brightness(0) saturate(100%) invert(28%) sepia(94%) saturate(2913%) hue-rotate(330deg) brightness(95%) contrast(101%)" }} />
@@ -207,12 +187,12 @@ function Index() {
                   <span className="text-gray-400 text-xs line-through">{p.old}</span>
                 </div>
                 <div className="flex items-center ml-2">
-                  <button aria-label="Adicionar" className="bg-rose-100 text-rose-600 h-8 px-3 flex items-center justify-center rounded-l-md">
+                  <Link to="/produto/$id" params={{ id: p.id }} aria-label="Adicionar" className="bg-rose-100 text-rose-600 h-8 px-3 flex items-center justify-center rounded-l-md">
                     <img src={carrinho} alt="" width={14} height={14} style={{ filter: "brightness(0) saturate(100%) invert(28%) sepia(94%) saturate(2913%) hue-rotate(330deg) brightness(95%) contrast(101%)" }} />
-                  </button>
-                  <button className="bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold h-8 px-3 flex items-center rounded-r-md">
+                  </Link>
+                  <Link to="/produto/$id" params={{ id: p.id }} className="bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold h-8 px-3 flex items-center rounded-r-md">
                     Comprar
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
