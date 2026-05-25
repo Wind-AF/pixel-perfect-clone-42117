@@ -32,6 +32,16 @@ import reviewFoto18 from "@/assets/review-foto-18.jpg";
 import reviewFoto19 from "@/assets/review-foto-19.jpg";
 import reviewFoto20 from "@/assets/review-foto-20.jpg";
 import reviewFoto21 from "@/assets/review-foto-21.jpg";
+import reviewFoto22 from "@/assets/review-foto-22.jpg";
+import reviewFoto23 from "@/assets/review-foto-23.jpg";
+import reviewFoto24 from "@/assets/review-foto-24.jpg";
+import reviewFoto25 from "@/assets/review-foto-25.jpg";
+import reviewFoto26 from "@/assets/review-foto-26.jpg";
+import reviewFoto27 from "@/assets/review-foto-27.jpg";
+import reviewFoto28 from "@/assets/review-foto-28.jpg";
+import reviewFoto29 from "@/assets/review-foto-29.jpg";
+import reviewFoto30 from "@/assets/review-foto-30.png";
+import reviewFoto31 from "@/assets/review-foto-31.jpg";
 
 export const Route = createFileRoute("/produto/$id")({
   component: ProdutoPage,
