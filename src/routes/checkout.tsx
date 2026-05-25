@@ -36,11 +36,13 @@ function useCountdown(seconds: number) {
 }
 
 type Step = 1 | 2 | 3 | 4;
+export type Customer = { email: string; phone: string; name: string; cpf: string };
 
 function CheckoutPage() {
   const navigate = useNavigate();
   const { items, total, updateQty, removeItem } = useCart();
   const [step, setStep] = useState<Step>(1);
+  const [customer, setCustomer] = useState<Customer>({ email: "", phone: "", name: "", cpf: "" });
   const timer = useCountdown(5 * 60 * 60 - 7);
 
   const freeShipping = total >= FREE_SHIPPING_MIN;
