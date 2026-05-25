@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { ArrowLeft, ShieldCheck, Lock, Truck, X, Ticket, Gift } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowLeft, ShieldCheck, Lock, Truck, X, Ticket, Gift, Check } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 
 export const Route = createFileRoute("/checkout")({
@@ -10,11 +10,15 @@ export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
 });
 
+const FREE_SHIPPING_MIN = 120;
+
 const fmt = (n: number) =>
   n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 const parsePrice = (p: string) =>
   Number(p.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".")) || 0;
+
+type ShippingOption = { id: string; name: string; days: string; price: number };
 
 function useCountdown(seconds: number) {
   const [s, setS] = useState(seconds);
@@ -28,72 +32,97 @@ function useCountdown(seconds: number) {
   return `${hh}:${mm}:${ss}`;
 }
 
+type Step = 1 | 2 | 3;
+
 function CheckoutPage() {
   const navigate = useNavigate();
   const { items, total, updateQty, removeItem } = useCart();
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<Step>(1);
   const timer = useCountdown(5 * 60 * 60 - 7);
 
-  const oldTotal = items.reduce((s, i) => s + parsePrice(i.price) * 8 * i.qty, 0);
+  const freeShipping = total >= FREE_SHIPPING_MIN;
+
+  const shippingOptions: ShippingOption[] = useMemo(
+    () => [
+      { id: "jadlog", name: "JadLog", days: "Receba em até 2 dias úteis", price: freeShipping ? 0 : 25.5 },
+      { id: "sedex", name: "Sedex-Express", days: "Receba em até 4 dias úteis", price: freeShipping ? 0 : 17.5 },
+      { id: "correio", name: "Correio", days: "Receba em até 7 dias úteis", price: 0 },
+    ],
+    [freeShipping],
+  );
+  const [shippingId, setShippingId] = useState("jadlog");
+  const shipping = shippingOptions.find((o) => o.id === shippingId) || shippingOptions[0];
+
   const oldRealistic = items.reduce((s, i) => {
     const old = parsePrice((i as any).old || "");
     return s + (old || parsePrice(i.price) * 8) * i.qty;
   }, 0);
   const descontos = Math.max(0, oldRealistic - total);
-  const frete = 25.5;
-  const totalFinal = total + frete;
+  const totalFinal = total + shipping.price;
+
+  const goBack = () => {
+    if (step === 1) navigate({ to: "/carrinho" });
+    else setStep((step - 1) as Step);
+  };
+
+  const subtitle =
+    step === 2 ? (
+      <>
+        <Lock className="w-3.5 h-3.5 text-emerald-600" />
+        <span className="text-emerald-600 font-medium">Dados criptografados</span>
+      </>
+    ) : (
+      <>
+        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+        <span className="text-emerald-600 font-medium">Pagamento 100% seguro</span>
+      </>
+    );
 
   return (
     <div className="min-h-screen bg-gray-50 pb-40">
       {/* Header */}
       <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
         <div className="max-w-3xl mx-auto px-4 h-16 flex items-center">
-          <button
-            onClick={() => (step === 2 ? setStep(1) : navigate({ to: "/carrinho" }))}
-            className="text-gray-800"
-            aria-label="Voltar"
-          >
+          <button onClick={goBack} className="text-gray-800" aria-label="Voltar">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="flex-1 text-center">
             <h1 className="text-base font-bold text-gray-900">Resumo do Pedido</h1>
-            <div className="flex items-center justify-center gap-1 text-xs mt-0.5">
-              {step === 1 ? (
-                <>
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                  <span className="text-emerald-600 font-medium">Compra garantida</span>
-                </>
-              ) : (
-                <>
-                  <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                  <span className="text-emerald-600 font-medium">Dados criptografados</span>
-                </>
-              )}
-            </div>
+            <div className="flex items-center justify-center gap-1 text-xs mt-0.5">{subtitle}</div>
           </div>
           <div className="w-5" />
         </div>
-        {/* dashed bar */}
-        <div className="h-1.5 flex">
-          {Array.from({ length: 24 }).map((_, i) => (
-            <div key={i} className={`flex-1 mx-[1px] ${i % 2 === 0 ? "bg-rose-400" : "bg-sky-400"}`} />
-          ))}
-        </div>
+        {step === 1 && (
+          <div className="h-1.5 flex">
+            {Array.from({ length: 24 }).map((_, i) => (
+              <div key={i} className={`flex-1 mx-[1px] ${i % 2 === 0 ? "bg-rose-400" : "bg-sky-400"}`} />
+            ))}
+          </div>
+        )}
       </header>
 
       <main className="max-w-3xl mx-auto px-3 pt-3">
-        {step === 1 ? (
+        {step === 1 && (
           <Step1
             items={items}
             total={total}
             descontos={descontos}
-            frete={frete}
+            frete={shipping.price}
+            shippingName={shipping.name}
             totalFinal={totalFinal}
             updateQty={updateQty}
             removeItem={removeItem}
+            freeShipping={freeShipping}
           />
-        ) : (
-          <Step2 />
+        )}
+        {step === 2 && <Step2 onNext={() => setStep(3)} />}
+        {step === 3 && (
+          <Step3
+            options={shippingOptions}
+            value={shippingId}
+            onChange={setShippingId}
+            freeShipping={freeShipping}
+          />
         )}
       </main>
 
@@ -106,7 +135,9 @@ function CheckoutPage() {
           </div>
         )}
         <div className="max-w-3xl mx-auto px-4 py-2.5 flex items-center justify-between">
-          <span className="text-sm text-gray-500">Total ({items.length} {items.length === 1 ? "item" : "itens"})</span>
+          <span className="text-sm text-gray-500">
+            Total ({items.length} {items.length === 1 ? "item" : "itens"})
+          </span>
           <span className="text-lg font-bold text-gray-900">R$ {fmt(totalFinal)}</span>
         </div>
         {step === 1 ? (
@@ -127,36 +158,93 @@ function CheckoutPage() {
   );
 }
 
+/* ---------- Stepper ---------- */
+
+function Stepper({ active }: { active: 1 | 2 | 3 }) {
+  const steps = [
+    { n: 1, label: "Identificação" },
+    { n: 2, label: "Entrega" },
+    { n: 3, label: "Pagamento" },
+  ];
+  return (
+    <div className="flex items-center justify-between px-2 py-4">
+      {steps.map((s, i) => {
+        const done = active > s.n;
+        const current = active === s.n;
+        return (
+          <div key={s.n} className="flex items-center flex-1 last:flex-none">
+            <div className="flex flex-col items-center">
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
+                  done
+                    ? "bg-emerald-500 text-white"
+                    : current
+                    ? "bg-slate-900 text-white"
+                    : "bg-gray-200 text-gray-400"
+                }`}
+              >
+                {done ? <Check className="w-5 h-5" /> : s.n}
+              </div>
+              <span
+                className={`text-xs mt-1 font-semibold ${
+                  current ? "text-slate-900" : done ? "text-emerald-600" : "text-gray-400"
+                }`}
+              >
+                {s.label}
+              </span>
+            </div>
+            {i < steps.length - 1 && (
+              <div className={`h-px flex-1 mx-2 ${done ? "bg-emerald-500" : "bg-gray-200"}`} />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ---------- Step 1: Resumo ---------- */
+
 function Step1({
   items,
   total,
   descontos,
   frete,
+  shippingName,
   totalFinal,
   updateQty,
   removeItem,
+  freeShipping,
 }: {
   items: ReturnType<typeof useCart>["items"];
   total: number;
   descontos: number;
   frete: number;
+  shippingName: string;
   totalFinal: number;
   updateQty: (id: string, q: number) => void;
   removeItem: (id: string) => void;
+  freeShipping: boolean;
 }) {
   return (
     <>
-      <div className="text-sm font-medium text-gray-700 px-1 py-2">Loja ({items.length} {items.length === 1 ? "item" : "itens"})</div>
-
-      {/* Frete grátis banner */}
-      <div className="bg-sky-50 rounded-xl flex items-center gap-3 px-4 py-3 mb-3">
-        <Truck className="w-6 h-6 text-sky-800" />
-        <span className="text-sky-900 font-bold text-base">Você ganhou frete grátis!</span>
+      <div className="text-sm font-medium text-gray-700 px-1 py-2">
+        Loja ({items.length} {items.length === 1 ? "item" : "itens"})
       </div>
 
-      {/* Resumo do carrinho */}
+      <div className="bg-sky-50 rounded-xl flex items-center gap-3 px-4 py-3 mb-3">
+        <Truck className="w-6 h-6 text-sky-800" />
+        <span className="text-sky-900 font-bold text-base">
+          {freeShipping
+            ? "Você ganhou frete grátis!"
+            : `Faltam R$ ${fmt(FREE_SHIPPING_MIN - total)} para o frete grátis`}
+        </span>
+      </div>
+
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
-        <h3 className="px-4 pt-4 pb-2 font-bold text-gray-900">Resumo do carrinho ({items.length} {items.length === 1 ? "item" : "itens"})</h3>
+        <h3 className="px-4 pt-4 pb-2 font-bold text-gray-900">
+          Resumo do carrinho ({items.length} {items.length === 1 ? "item" : "itens"})
+        </h3>
         <div className="px-3 pb-3 space-y-3">
           {items.map((item) => {
             const price = parsePrice(item.price);
@@ -206,7 +294,6 @@ function Step1({
         </div>
       </div>
 
-      {/* Descontos aplicados */}
       <div className="bg-white border-t border-b border-gray-100 mt-3 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Ticket className="w-5 h-5 text-rose-500" />
@@ -215,13 +302,18 @@ function Step1({
         <span className="text-sm font-bold text-rose-600 bg-rose-50 px-2 py-1 rounded">R$ {fmt(descontos)}</span>
       </div>
 
-      {/* Resumo financeiro */}
       <div className="bg-white px-4 py-4 mt-3 rounded-xl border border-gray-100">
         <h4 className="font-bold text-gray-900 mb-3">Resumo financeiro</h4>
         <div className="space-y-2 text-sm">
           <Row label="Subtotal" value={`R$ ${fmt(total)}`} />
-          <Row label={<span className="text-rose-600 font-semibold">Descontos</span>} value={<span className="text-rose-600 font-semibold">R$ {fmt(descontos)}</span>} />
-          <Row label="Frete" value={`JadLog (R$ ${fmt(frete)})`} />
+          <Row
+            label={<span className="text-rose-600 font-semibold">Descontos</span>}
+            value={<span className="text-rose-600 font-semibold">R$ {fmt(descontos)}</span>}
+          />
+          <Row
+            label="Frete"
+            value={frete === 0 ? <span className="text-emerald-600 font-semibold">Grátis</span> : `${shippingName} (R$ ${fmt(frete)})`}
+          />
         </div>
         <div className="border-t border-gray-100 mt-3 pt-3 flex items-center justify-between">
           <span className="font-bold text-gray-900">Total</span>
@@ -241,7 +333,9 @@ function Row({ label, value }: { label: React.ReactNode; value: React.ReactNode 
   );
 }
 
-function Step2() {
+/* ---------- Step 2: Identificação ---------- */
+
+function Step2({ onNext }: { onNext: () => void }) {
   const [form, setForm] = useState({ email: "", phone: "", name: "", cpf: "" });
   const [error, setError] = useState<string | null>(null);
 
@@ -261,72 +355,166 @@ function Step2() {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim());
-    if (!emailOk) return setError("E-mail inválido");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) return setError("E-mail inválido");
     if (form.phone.replace(/\D/g, "").length < 10) return setError("Telefone inválido");
     if (form.name.trim().split(" ").length < 2) return setError("Informe nome e sobrenome");
     if (form.cpf.replace(/\D/g, "").length !== 11) return setError("CPF inválido");
     setError(null);
-    alert("Próximo passo: entrega (a implementar)");
+    onNext();
   };
 
   return (
-    <form onSubmit={submit} className="bg-white rounded-xl border border-gray-100 px-4 py-5 space-y-4 mt-2">
-      <Field label="E-mail">
-        <input
-          type="email"
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-          maxLength={255}
-          className="w-full h-12 rounded-lg border border-gray-300 px-3 text-sm focus:outline-none focus:border-gray-900"
-        />
-      </Field>
-      <Field label="Telefone">
-        <input
-          inputMode="numeric"
-          placeholder="(99) 99999-9999"
-          value={form.phone}
-          onChange={(e) => setForm({ ...form, phone: maskPhone(e.target.value) })}
-          className="w-full h-12 rounded-lg border border-gray-300 px-3 text-sm focus:outline-none focus:border-gray-900"
-        />
-      </Field>
-      <Field label="Nome completo">
-        <input
-          placeholder="Nome e Sobrenome"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          maxLength={120}
-          className="w-full h-12 rounded-lg border border-gray-300 px-3 text-sm focus:outline-none focus:border-gray-900"
-        />
-      </Field>
-      <Field label="CPF/CNPJ">
-        <input
-          inputMode="numeric"
-          placeholder="000.000.000-00"
-          value={form.cpf}
-          onChange={(e) => setForm({ ...form, cpf: maskCpf(e.target.value) })}
-          className="w-full h-12 rounded-lg border border-gray-300 px-3 text-sm focus:outline-none focus:border-gray-900"
-        />
-      </Field>
+    <div className="bg-white rounded-xl border border-gray-100 mt-2">
+      <Stepper active={1} />
+      <form onSubmit={submit} className="px-4 pb-5 space-y-4">
+        <Field label="E-mail">
+          <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} maxLength={255} className={inputCls} />
+        </Field>
+        <Field label="Telefone">
+          <input inputMode="numeric" placeholder="(99) 99999-9999" value={form.phone} onChange={(e) => setForm({ ...form, phone: maskPhone(e.target.value) })} className={inputCls} />
+        </Field>
+        <Field label="Nome completo">
+          <input placeholder="Nome e Sobrenome" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} maxLength={120} className={inputCls} />
+        </Field>
+        <Field label="CPF/CNPJ">
+          <input inputMode="numeric" placeholder="000.000.000-00" value={form.cpf} onChange={(e) => setForm({ ...form, cpf: maskCpf(e.target.value) })} className={inputCls} />
+        </Field>
 
-      <div className="border border-dashed border-gray-300 rounded-lg p-4">
-        <h4 className="font-bold text-gray-900 text-sm mb-2">Por que precisamos desses dados?</h4>
-        <ul className="list-disc pl-5 text-sm text-gray-700 space-y-1">
-          <li>Enviar o comprovante de compra;</li>
-          <li>Garantir a devolução caso necessário;</li>
-          <li>Acompanhar o andamento do pedido.</li>
-        </ul>
-      </div>
+        <div className="border border-dashed border-gray-300 rounded-lg p-4">
+          <h4 className="font-bold text-gray-900 text-sm mb-2">Por que precisamos desses dados?</h4>
+          <ul className="list-disc pl-5 text-sm text-gray-700 space-y-1">
+            <li>Enviar o comprovante de compra;</li>
+            <li>Garantir a devolução caso necessário;</li>
+            <li>Acompanhar o andamento do pedido.</li>
+          </ul>
+        </div>
 
-      {error && <div className="text-sm text-rose-600 text-center">{error}</div>}
+        {error && <div className="text-sm text-rose-600 text-center">{error}</div>}
 
-      <button
-        type="submit"
-        className="w-full h-12 rounded-lg bg-slate-900 text-white font-bold text-base"
-      >
-        Ir para entrega
-      </button>
-    </form>
+        <button type="submit" className="w-full h-12 rounded-lg bg-slate-900 text-white font-bold text-base">
+          Ir para entrega
+        </button>
+      </form>
+    </div>
+  );
+}
+
+/* ---------- Step 3: Entrega ---------- */
+
+function Step3({
+  options,
+  value,
+  onChange,
+  freeShipping,
+}: {
+  options: ShippingOption[];
+  value: string;
+  onChange: (id: string) => void;
+  freeShipping: boolean;
+}) {
+  const [form, setForm] = useState({
+    cep: "",
+    address: "",
+    number: "",
+    district: "",
+    city: "",
+    state: "",
+    complement: "",
+  });
+  const [error, setError] = useState<string | null>(null);
+
+  const maskCep = (v: string) => {
+    const d = v.replace(/\D/g, "").slice(0, 8);
+    return d.length > 5 ? `${d.slice(0, 5)}-${d.slice(5)}` : d;
+  };
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (form.cep.replace(/\D/g, "").length !== 8) return setError("CEP inválido");
+    if (!form.address.trim()) return setError("Informe o endereço");
+    if (!form.number.trim()) return setError("Informe o número");
+    if (!form.district.trim()) return setError("Informe o bairro");
+    if (!form.city.trim()) return setError("Informe a cidade");
+    if (!form.state.trim()) return setError("Informe o estado");
+    setError(null);
+    alert("Próximo passo: pagamento (a implementar)");
+  };
+
+  const selected = options.find((o) => o.id === value) || options[0];
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-100 mt-2">
+      <Stepper active={2} />
+      <form onSubmit={submit} className="px-4 pb-5 space-y-4">
+        <Field label="CEP">
+          <input inputMode="numeric" placeholder="00000-000" value={form.cep} onChange={(e) => setForm({ ...form, cep: maskCep(e.target.value) })} className={inputCls} />
+        </Field>
+        <Field label="Endereço">
+          <input placeholder="Rua / Avenida" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} maxLength={200} className={inputCls} />
+        </Field>
+        <Field label="Número">
+          <input value={form.number} onChange={(e) => setForm({ ...form, number: e.target.value })} maxLength={10} className={inputCls} />
+        </Field>
+        <Field label="Bairro">
+          <input value={form.district} onChange={(e) => setForm({ ...form, district: e.target.value })} maxLength={100} className={inputCls} />
+        </Field>
+        <Field label="Cidade">
+          <input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} maxLength={100} className={inputCls} />
+        </Field>
+        <Field label="Estado">
+          <input value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} maxLength={2} className={inputCls} />
+        </Field>
+        <Field label="Complemento">
+          <input placeholder="Apartamento, bloco, referência (opcional)" value={form.complement} onChange={(e) => setForm({ ...form, complement: e.target.value })} maxLength={120} className={inputCls} />
+        </Field>
+
+        {freeShipping && (
+          <div className="bg-emerald-50 text-emerald-700 text-sm font-semibold rounded-lg px-3 py-2 flex items-center gap-2">
+            <Truck className="w-4 h-4" />
+            Você atingiu o mínimo de R$ {fmt(FREE_SHIPPING_MIN)} — frete grátis aplicado!
+          </div>
+        )}
+
+        <div className="space-y-2">
+          {options.map((o) => {
+            const active = o.id === value;
+            return (
+              <label
+                key={o.id}
+                className={`flex items-center gap-3 border rounded-lg px-3 py-3 cursor-pointer ${
+                  active ? "border-blue-500 bg-blue-50/30" : "border-gray-200"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="shipping"
+                  checked={active}
+                  onChange={() => onChange(o.id)}
+                  className="accent-blue-600 w-4 h-4"
+                />
+                <div className="flex-1">
+                  <div className="font-bold text-gray-900 text-sm">{o.name}</div>
+                  <div className="text-xs text-gray-500">{o.days}</div>
+                </div>
+                <div className="font-bold text-gray-900 text-sm">
+                  {o.price === 0 ? "Grátis" : `R$ ${fmt(o.price)}`}
+                </div>
+              </label>
+            );
+          })}
+        </div>
+
+        <div className="text-sm text-gray-700">
+          Frete selecionado: <strong>{selected.name}</strong> ({selected.price === 0 ? "Grátis" : `R$ ${fmt(selected.price)}`})
+        </div>
+
+        {error && <div className="text-sm text-rose-600 text-center">{error}</div>}
+
+        <button type="submit" className="w-full h-12 rounded-lg bg-slate-900 text-white font-bold text-base">
+          Ir para pagamento
+        </button>
+      </form>
+    </div>
   );
 }
 
@@ -338,3 +526,6 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     </label>
   );
 }
+
+const inputCls =
+  "w-full h-12 rounded-lg border border-gray-300 px-3 text-sm focus:outline-none focus:border-gray-900";
