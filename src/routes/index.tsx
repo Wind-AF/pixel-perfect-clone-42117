@@ -18,9 +18,64 @@ function Index() {
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>("Produtos");
   const [activeFilter, setActiveFilter] = useState<(typeof filters)[number]>("Recomendado");
   const [following, setFollowing] = useState(false);
+  const [showPopup, setShowPopup] = useState(true);
+  const [countdown, setCountdown] = useState({ h: 23, m: 59, s: 58 });
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setCountdown((c) => {
+        let { h, m, s } = c;
+        s--;
+        if (s < 0) { s = 59; m--; }
+        if (m < 0) { m = 59; h--; }
+        if (h < 0) { h = 0; m = 0; s = 0; }
+        return { h, m, s };
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const pad = (n: number) => n.toString().padStart(2, "0");
 
   return (
     <div className="min-h-screen bg-white text-gray-800 text-sm max-w-[500px] mx-auto shadow-sm">
+      {showPopup && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-6" onClick={() => setShowPopup(false)}>
+          <div className="relative w-full max-w-[340px]" onClick={(e) => e.stopPropagation()}>
+            <button
+              aria-label="Fechar"
+              onClick={() => setShowPopup(false)}
+              className="absolute -top-10 right-0 text-rose-500"
+            >
+              <X className="w-7 h-7" strokeWidth={3} />
+            </button>
+            <h2 className="text-center text-yellow-400 font-extrabold text-xl tracking-wide mb-3" style={{ textShadow: "1px 1px 0 rgba(0,0,0,0.15)" }}>
+              COMECE COLECIONANDO
+            </h2>
+            <div className="bg-rose-500 rounded-2xl p-1.5 shadow-xl">
+              <div className="bg-white rounded-xl px-6 pt-7 pb-6 text-center">
+                <div className="text-5xl font-extrabold text-gray-900 leading-none">70% OFF</div>
+                <div className="text-rose-500 font-semibold mt-3 text-base">no seu pedido!</div>
+                <p className="text-gray-700 text-sm mt-5 leading-snug">
+                  Você pode começar o ano<br />com um novo hobby.
+                </p>
+                <p className="text-gray-700 text-sm mt-3 leading-snug">
+                  Aproveita: Albuns estão com 70% OFF.
+                </p>
+              </div>
+              <div className="text-center text-white font-bold py-3 text-sm">
+                Termina em {pad(countdown.h)}:{pad(countdown.m)}:{pad(countdown.s)}
+              </div>
+              <button
+                onClick={() => setShowPopup(false)}
+                className="w-full bg-white text-rose-500 font-bold py-3 rounded-b-xl text-base"
+              >
+                Resgatar agora
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <header className="sticky top-0 z-30 bg-white border-b border-gray-200 shadow-sm">
         <div className="flex items-center justify-between p-3">
