@@ -98,10 +98,10 @@ function Index() {
             <button aria-label="Compartilhar">
               <img src={compartilhar} alt="Compartilhar" width={22} height={22} />
             </button>
-            <button aria-label="Carrinho" className="relative">
+            <Link to="/carrinho" aria-label="Carrinho" className="relative">
               <img src={carrinho} alt="Carrinho" width={22} height={22} />
               <span className="absolute -top-2 -right-3 flex w-5 h-5 bg-rose-600 text-white items-center justify-center rounded-full text-[10px] font-bold">{cartCount}</span>
-            </button>
+            </Link>
           </div>
         </div>
       </header>
