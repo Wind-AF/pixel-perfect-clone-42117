@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
-import { ChevronRight, Truck, Star, Video } from "lucide-react";
+import { ChevronRight, Truck, Star, Video, Home, MessageCircle } from "lucide-react";
 import iconBack from "@/assets/icon-back.png";
 import iconSave from "@/assets/icon-save.png";
 import iconRaio from "@/assets/icon-raio.png";
@@ -316,25 +316,16 @@ function ProdutoPage() {
         </div>
 
         {[
-          { name: "Gabriel Ferreira", avatar: null, initial: "G", date: "2026-05-17 23:32:27", text: "Gostei demais da compra, qualidade excelente e quantidade certinha. Pra quem curte coleção vale muito a pena 🔥", photos: reviewPhotos },
-          { name: "Juan Pablo", avatar: reviewerJuan, date: "2026-05-14 18:05:11", text: "Chegou rapidinho e bem embalado. Recomendo demais, qualidade muito boa!" },
-          { name: "Joyce Almeida", avatar: reviewerJoyce, date: "2026-05-10 09:22:48", text: "Amei! Superou minhas expectativas, virei cliente fiel da loja ❤️" },
-          { name: "José Henrique", avatar: reviewerJose, date: "2026-05-06 14:47:02", text: "Produto top, valor justo e entrega antes do prazo. Já comprei de novo!" },
-          { name: "Júlia & Rafael", avatar: reviewerJuliaRafael, date: "2026-05-02 21:13:55", text: "A gente comprou pra usar junto e amamos! Qualidade impecável, vale cada centavo." },
-          { name: "Lucas Oliveira", avatar: reviewerLucas, date: "2026-04-28 16:08:14", text: "Álbum lindo demais, capa firme e impressão de qualidade. Já comprei os pacotinhos pra começar a colar 🔥⚽", photos: [reviewFoto42, reviewFoto43, reviewFoto44, reviewFoto45] },
-          { name: "Camila Souza", avatar: reviewerCamila, date: "2026-04-24 12:31:50", text: "Chegou rapidinho, embalagem caprichada. Meu filho amou de presente, recomendo muito!" },
-          { name: "Beatriz Lima", avatar: reviewerBia, date: "2026-04-20 19:42:07", text: "Atendimento ótimo e produto exatamente como nas fotos. Voltarei a comprar com certeza ✨" },
-          { name: "Pedro Henrique", avatar: reviewerPedro, date: "2026-04-16 08:55:33", text: "Muito bom, valeu cada centavo. Recebi antes do prazo e veio tudo certinho." },
-          { name: "Thiago Martins", avatar: reviewerThiago, date: "2026-04-12 21:17:22", text: "Top demais! Qualidade impressionante pelo preço. Recomendo de olhos fechados." },
-          { name: "Marcos Vinícius", avatar: reviewerMarcos, date: "2026-04-08 14:03:46", text: "Comprei pra colecionar e amei. Loja confiável, entrega rápida e produto original." },
-        ].map((r, idx) => (
-          <div key={r.name} className={`pt-3 ${idx === 0 ? "border-t border-gray-100" : "border-t border-gray-100 mt-3"}`}>
+          { name: "Gabriel Ferreira", avatar: reviewerLucas, date: "2026-05-17 23:32:27", text: "Gostei demais da compra, qualidade excelente e quantidade certinha. Pra quem curte coleção vale muito a pena 🔥", photos: reviewPhotos.slice(0, 19) },
+          { name: "Rafael Costa", avatar: reviewerThiago, date: "2026-05-14 18:05:11", text: "Comprei pra fazer coleção e me surpreendi, veio certinho os 200 envelopes. Recomendo demais!", photos: reviewPhotos.slice(19, 37) },
+          { name: "Matheus Silva", avatar: reviewerPedro, date: "2026-05-10 09:22:48", text: "Curti muito, parece original mesmo. Veio rapidão e ainda mandaram tudo organizado na caixa 👏", photos: reviewPhotos.slice(37, 51) },
+          { name: "Juliana Martins", avatar: reviewerBia, date: "2026-05-06 14:47:02", text: "Meu filho ficou doido quando viu a caixa cheia 😂 muito bom mesmo, já quero pedir outra", photos: reviewPhotos.slice(42, 50) },
+          { name: "Amanda Oliveira", avatar: reviewerCamila, date: "2026-05-02 21:13:55", text: "Perfeitooo 😍 chegou antes do prazo e os pacotinhos são lindos pessoalmente. Valeu muito a compra!", photos: reviewPhotos.slice(46, 51) },
+          { name: "micael alves", avatar: reviewerJose, date: "2026-04-28 16:08:14", text: "Lucas Henrique", photos: [reviewFoto42, reviewFoto43] },
+        ].map((r) => (
+          <div key={r.name} className="pt-3 border-t border-gray-100 mt-3">
             <div className="flex items-center gap-2 mb-1">
-              {r.avatar ? (
-                <img src={r.avatar} alt={r.name} className="w-8 h-8 rounded-full object-cover" />
-              ) : (
-                <div className="w-8 h-8 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center text-xs font-bold">{r.initial}</div>
-              )}
+              <img src={r.avatar} alt={r.name} className="w-8 h-8 rounded-full object-cover" />
               <div className="flex flex-col">
                 <span className="text-xs font-semibold">{r.name}</span>
                 <span className="text-[10px] text-teal-500">{r.date}</span>
@@ -347,7 +338,7 @@ function ProdutoPage() {
             </div>
             <p className="text-xs leading-relaxed">{r.text}</p>
             {r.photos && (
-              <div className="grid grid-cols-3 gap-1.5 mt-2">
+              <div className="grid grid-cols-4 gap-1.5 mt-2">
                 {r.photos.map((src, i) => (
                   <img key={i} src={src} alt={`Foto ${i + 1}`} className="aspect-square w-full object-cover rounded-md" />
                 ))}
@@ -355,21 +346,81 @@ function ProdutoPage() {
             )}
           </div>
         ))}
+
+        {/* Avaliações da loja */}
+        <div className="mt-5 pt-4 border-t border-gray-100">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="font-bold text-sm">Avaliações da loja (13,9 mil)</div>
+              <div className="text-[11px] text-gray-500 mt-0.5">Resumo e classificação dos clientes</div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-gray-400 mt-1" />
+          </div>
+          <div className="flex gap-2 mt-3 overflow-x-auto scrollbar-hide">
+            <span className="px-3 py-1.5 bg-gray-100 rounded-full text-[11px] whitespace-nowrap">Inclui imagens ou vídeos <span className="font-semibold">(2,5 mi)</span></span>
+            <span className="px-3 py-1.5 bg-gray-100 rounded-full text-[11px] whitespace-nowrap flex items-center gap-1"><Star className="w-3 h-3 fill-yellow-400 text-yellow-400" /><span className="font-semibold">5</span> (12,3 mil)</span>
+            <span className="px-3 py-1.5 bg-gray-100 rounded-full text-[11px] whitespace-nowrap flex items-center gap-1"><Star className="w-3 h-3 fill-yellow-400 text-yellow-400" /><span className="font-semibold">4</span> (857)</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Loja */}
+      <section className="px-4 mt-4 py-3 border-y border-gray-100 flex items-center gap-3">
+        <div className="w-11 h-11 rounded-full bg-yellow-300 flex items-center justify-center text-[10px] font-black text-red-600 italic shrink-0">PANINI</div>
+        <div className="flex-1">
+          <div className="font-bold text-sm">Album 2026</div>
+          <div className="text-[11px] text-gray-500">38808 vendido(s)</div>
+        </div>
+        <button className="px-4 py-1.5 bg-gray-100 text-gray-800 text-xs font-semibold rounded-full">Seguir</button>
       </section>
 
       {/* Mais desta loja */}
-      <section className="px-4 pt-6">
-        <h2 className="font-semibold text-sm mb-2">Mais desta loja</h2>
-        <div className="grid grid-cols-2 gap-3">
-          {products.filter((p) => p.id !== product.id).slice(0, 4).map((p) => (
-            <Link to="/produto/$id" params={{ id: p.id }} key={p.id} className="block">
-              <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden">
+      <section className="px-4 pt-5">
+        <h2 className="font-semibold text-sm mb-3">Mais desta loja</h2>
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-2">
+          {products.filter((p) => p.id !== product.id).slice(0, 6).map((p) => (
+            <Link to="/produto/$id" params={{ id: p.id }} key={p.id} className="block shrink-0 w-32">
+              <div className="aspect-square bg-white rounded-lg overflow-hidden flex items-center justify-center">
                 <img src={p.img} alt={p.name} className="w-full h-full object-contain" />
               </div>
               <div className="mt-1.5">
-                <div className="text-rose-500 font-bold text-sm">{p.price}</div>
+                <div className="font-bold text-sm">{p.price}</div>
+                <span className="inline-block mt-1 text-[10px] font-bold text-rose-500 bg-rose-50 px-1.5 py-0.5 rounded">-60%</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Descrição */}
+      <section className="px-4 pt-5">
+        <p className="text-sm leading-relaxed text-gray-800">
+          As emoções do maior espetáculo esportivo do mundo eternizadas no maior álbum de figurinhas de todos os tempos! Uma coleção completa, com todas as seleções classificadas, cromos especiais e todos os detalhes para você acompanhar de pertinho a disputa pela taça da album 2026!
+        </p>
+      </section>
+
+      {/* Você também pode gostar */}
+      <section className="px-4 pt-6 bg-gray-50 mt-4 pb-4">
+        <h2 className="font-semibold text-sm mb-3 pt-4">Você também pode gostar</h2>
+        <div className="grid grid-cols-2 gap-3">
+          {products.filter((p) => p.id !== product.id).map((p) => (
+            <Link to="/produto/$id" params={{ id: p.id }} key={p.id} className="block bg-white rounded-xl overflow-hidden border border-gray-100">
+              <div className="aspect-square bg-white flex items-center justify-center p-3">
+                <img src={p.img} alt={p.name} className="w-full h-full object-contain" />
+              </div>
+              <div className="px-2.5 pb-2.5">
+                <div className="text-[12px] font-bold leading-tight line-clamp-2 min-h-[2.5em]">{p.name}</div>
+                <div className="mt-1.5 inline-flex items-center gap-1 bg-rose-50 text-rose-500 text-[10px] font-bold px-1.5 py-0.5 rounded">
+                  <img src={bilhete} alt="" width={10} height={10} style={{ filter: "brightness(0) saturate(100%) invert(28%) sepia(94%) saturate(2913%) hue-rotate(330deg) brightness(95%) contrast(101%)" }} />
+                  60% OFF
+                </div>
+                <div className="mt-1 inline-block ml-1 bg-emerald-50 text-emerald-600 text-[10px] font-semibold px-1.5 py-0.5 rounded">Frete grátis</div>
+                <div className="flex items-center gap-1 mt-1.5 text-[11px] text-gray-600">
+                  <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" /> 4.7 | 4312 vendido(s)
+                </div>
+                <div className="mt-1.5 text-rose-500 font-bold text-base">{p.price}</div>
                 <div className="text-[11px] text-gray-400 line-through">{p.old}</div>
-                <div className="text-[11px] text-gray-700 truncate">{p.name}</div>
+                <button className="mt-2 w-full h-8 rounded-full bg-gradient-to-r from-rose-100 to-rose-500 text-white text-xs font-bold flex items-center justify-end pr-4">Comprar</button>
               </div>
             </Link>
           ))}
@@ -386,15 +437,19 @@ function ProdutoPage() {
 
       {/* Sticky bottom CTA */}
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[500px] bg-white border-t border-gray-200 px-3 py-2 flex items-center gap-2 z-40">
-        <button className="flex flex-col items-center justify-center text-[10px] text-gray-600 w-12">
-          <img src={carrinho2} alt="" width={22} height={22} />
+        <button className="flex flex-col items-center justify-center text-[10px] text-gray-600 w-10">
+          <Home className="w-5 h-5" strokeWidth={1.8} />
+          <span className="mt-0.5">Loja</span>
         </button>
-        <button className="flex-1 h-11 rounded-l-full bg-amber-400 text-white text-sm font-bold flex items-center justify-center gap-1">
-          <img src={bilhete2} alt="" width={16} height={16} style={{ filter: "brightness(0) invert(1)" }} />
-          Adicionar ao carrinho
+        <button className="flex flex-col items-center justify-center text-[10px] text-gray-600 w-10">
+          <MessageCircle className="w-5 h-5" strokeWidth={1.8} />
+          <span className="mt-0.5">Chat</span>
         </button>
-        <button className="flex-1 h-11 rounded-r-full bg-rose-500 text-white text-sm font-bold">
-          Comprar agora
+        <button className="flex-1 h-11 rounded-full bg-gray-100 text-gray-800 text-sm font-bold flex items-center justify-center px-2 text-center leading-tight">
+          Adicionar ao Carrinho
+        </button>
+        <button className="flex-1 h-11 rounded-full bg-rose-500 text-white text-sm font-bold">
+          Comprar Agora
         </button>
       </div>
 
