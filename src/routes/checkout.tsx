@@ -1,10 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, ShieldCheck, Lock, Truck, X, Ticket, Gift, Check, ChevronDown } from "lucide-react";
-import { useCart } from "@/hooks/use-cart";
+import { ArrowLeft, ShieldCheck, Lock, Gift, Check, ChevronDown } from "lucide-react";
+import { useCart, type CartItem } from "@/hooks/use-cart";
 import bumpNeymar from "@/assets/bump-neymar.jpg";
 import bumpLegend from "@/assets/bump-legend.jpg";
 import bumpCaixinha from "@/assets/bump-caixinha.jpg";
+import bumpCoca from "@/assets/bump-coca.jpg";
+import bumpAdesivo from "@/assets/bump-adesivo-neymar.jpg";
+import pixLogo from "@/assets/pix-logo.png";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -13,15 +16,11 @@ export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
 });
 
-const FREE_SHIPPING_MIN = 120;
-
 const fmt = (n: number) =>
   n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 const parsePrice = (p: string) =>
   Number(p.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".")) || 0;
-
-type ShippingOption = { id: string; name: string; days: string; price: number; oldPrice?: number };
 
 function useCountdown(seconds: number) {
   const [s, setS] = useState(seconds);
@@ -35,57 +34,130 @@ function useCountdown(seconds: number) {
   return `${hh}:${mm}:${ss}`;
 }
 
-type Step = 1 | 2 | 3 | 4;
+function useRotatingSubtitle() {
+  const labels = [
+    { icon: ShieldCheck, text: "Pagamento 100% seguro" },
+    { icon: Lock, text: "Dados criptografados" },
+    { icon: Check, text: "Compra garantida" },
+  ];
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setI((v) => (v + 1) % labels.length), 2800);
+    return () => clearInterval(id);
+  }, [labels.length]);
+  const Cur = labels[i];
+  const Icon = Cur.icon;
+  return (
+    <>
+      <Icon className="w-3.5 h-3.5 text-emerald-600" />
+      <span className="text-emerald-600 font-medium">{Cur.text}</span>
+    </>
+  );
+}
+
+type Step = 1 | 2 | 4;
 export type Customer = { email: string; phone: string; name: string; cpf: string };
+
+type Bump = {
+  id: string;
+  name: string;
+  img: string;
+  price: number;
+  old: number;
+  note?: string;
+  variants?: string[];
+};
+
+const BUMPS: Bump[] = [
+  {
+    id: "bump-legend",
+    name: "Aumente suas chances para garantir Figurinhas Raras✨",
+    img: bumpLegend,
+    price: 12.7,
+    old: 39.58,
+  },
+  {
+    id: "bump-caixinha",
+    name: "Caixinha Temática Copa do Mundo 2026 - Capacidade até 500 Figurinhas",
+    img: bumpCaixinha,
+    price: 8.98,
+    old: 37.58,
+    variants: ["Preto", "Dourado"],
+  },
+  {
+    id: "bump-adesivo-neymar",
+    name: "Adesivo Autocolante Neymar Jr. & Mercado Livre",
+    img: bumpAdesivo,
+    price: 19.99,
+    old: 59.99,
+  },
+  {
+    id: "bump-neymar-lote",
+    name: "[Lançamento] Novo Lote Neymar Edition chance de 12%. aumente sua chance ao adicionar mais!",
+    img: bumpNeymar,
+    price: 4.9,
+    old: 31.9,
+    note: "Após adicionar 1x: 12% de sorte",
+  },
+  {
+    id: "bump-coca",
+    name: "Kit 6 Garrafas Coca-cola 600ml Copa 2026 Panini Figurinhas",
+    img: bumpCoca,
+    price: 29.9,
+    old: 79.9,
+  },
+];
 
 function CheckoutPage() {
   const navigate = useNavigate();
-  const { items, total, updateQty, removeItem } = useCart();
+  const { items, addItem, updateQty, total } = useCart();
   const [step, setStep] = useState<Step>(1);
   const [customer, setCustomer] = useState<Customer>({ email: "", phone: "", name: "", cpf: "" });
+  const [variantModal, setVariantModal] = useState<Bump | null>(null);
   const timer = useCountdown(5 * 60 * 60 - 7);
+  const subtitle = useRotatingSubtitle();
 
-  const freeShipping = total >= FREE_SHIPPING_MIN;
-
-  const shippingOptions: ShippingOption[] = useMemo(
-    () => [
-      { id: "jadlog", name: "JadLog", days: "Receba em até 2 dias úteis", price: freeShipping ? 0 : 16.23, oldPrice: freeShipping ? undefined : 62.44 },
-      { id: "sedex", name: "Sedex-Express", days: "Receba em até 4 dias úteis", price: 9.34, oldPrice: 32.71 },
-      { id: "correio", name: "Correio", days: "Receba em até 7 dias úteis", price: 0 },
-    ],
-    [freeShipping],
-  );
-  const [shippingId, setShippingId] = useState("jadlog");
-  const shipping = shippingOptions.find((o) => o.id === shippingId) || shippingOptions[0];
-
+  const totalFinal = total;
   const oldRealistic = items.reduce((s, i) => {
-    const old = parsePrice((i as any).old || "");
+    const old = parsePrice((i as { old?: string }).old || "");
     return s + (old || parsePrice(i.price) * 8) * i.qty;
   }, 0);
   const descontos = Math.max(0, oldRealistic - total);
-  const totalFinal = total + shipping.price;
 
   const goBack = () => {
     if (step === 1) navigate({ to: "/carrinho" });
-    else setStep((step - 1) as Step);
+    else setStep(1);
   };
 
-  const subtitle =
-    step === 2 ? (
-      <>
-        <Lock className="w-3.5 h-3.5 text-emerald-600" />
-        <span className="text-emerald-600 font-medium">Dados criptografados</span>
-      </>
-    ) : (
-      <>
-        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-        <span className="text-emerald-600 font-medium">Pagamento 100% seguro</span>
-      </>
+  const addBump = (b: Bump, variant?: string) => {
+    const suffix = variant ? `-${variant}` : "";
+    addItem(
+      {
+        id: `${b.id}${suffix}`,
+        name: variant ? `${b.name} — ${variant}` : b.name,
+        img: b.img,
+        price: `R$ ${fmt(b.price)}`,
+      },
+      1,
     );
+  };
+
+  const handleBumpClick = (b: Bump) => {
+    if (b.variants && b.variants.length > 0) {
+      setVariantModal(b);
+    } else {
+      addBump(b);
+    }
+  };
+
+  // Build interleaved list: cart items first, then bumps not yet in cart
+  const cartItems = items;
+  const bumpsToShow = BUMPS.filter(
+    (b) => !items.some((i) => i.id === b.id || i.id.startsWith(b.id + "-")),
+  );
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-40">
-      {/* Header */}
+    <div className="min-h-screen bg-gray-50 pb-44">
       <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
         <div className="max-w-3xl mx-auto px-4 h-16 flex items-center">
           <button onClick={goBack} className="text-gray-800" aria-label="Voltar">
@@ -93,254 +165,309 @@ function CheckoutPage() {
           </button>
           <div className="flex-1 text-center">
             <h1 className="text-base font-bold text-gray-900">Resumo do Pedido</h1>
-            <div className="flex items-center justify-center gap-1 text-xs mt-0.5">{subtitle}</div>
+            <div className="flex items-center justify-center gap-1 text-xs mt-0.5">
+              {step === 2 ? (
+                <>
+                  <Lock className="w-3.5 h-3.5 text-emerald-600" />
+                  <span className="text-emerald-600 font-medium">Dados criptografados</span>
+                </>
+              ) : (
+                subtitle
+              )}
+            </div>
           </div>
           <div className="w-5" />
         </div>
-        {step === 1 && (
-          <div className="h-1.5 flex">
-            {Array.from({ length: 24 }).map((_, i) => (
-              <div key={i} className={`flex-1 mx-[1px] ${i % 2 === 0 ? "bg-rose-400" : "bg-sky-400"}`} />
-            ))}
-          </div>
-        )}
       </header>
 
       <main className="max-w-3xl mx-auto px-3 pt-3">
         {step === 1 && (
           <Step1
-            items={items}
-            total={total}
-            descontos={descontos}
-            frete={shipping.price}
-            shippingName={shipping.name}
-            totalFinal={totalFinal}
+            cartItems={cartItems}
+            bumpsToShow={bumpsToShow}
             updateQty={updateQty}
-            removeItem={removeItem}
-            freeShipping={freeShipping}
+            onBumpClick={handleBumpClick}
+            getBumpCount={(b) =>
+              items
+                .filter((i) => i.id === b.id || i.id.startsWith(b.id + "-"))
+                .reduce((s, i) => s + i.qty, 0)
+            }
           />
         )}
-        {step === 2 && <Step2 initial={customer} onNext={(c) => { setCustomer(c); setStep(3); }} />}
-        {step === 3 && (
-          <Step3
-            options={shippingOptions}
-            value={shippingId}
-            onChange={setShippingId}
-            freeShipping={freeShipping}
-            onNext={() => setStep(4)}
+        {step === 2 && (
+          <Step2
+            initial={customer}
+            onNext={(c) => {
+              setCustomer(c);
+              setStep(4);
+            }}
           />
         )}
         {step === 4 && <Step4 customer={customer} totalFinal={totalFinal} />}
       </main>
 
-      {/* Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-40">
-        {descontos > 0 && (
-          <div className="bg-rose-50 text-rose-600 text-[13px] text-center py-2 px-3 flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5">
-            <Gift className="w-4 h-4 shrink-0" />
-            <span>Você está economizando <strong>R$ {fmt(descontos)}</strong> neste pedido.</span>
-          </div>
-        )}
-        <div className="max-w-3xl mx-auto px-4 py-2.5 flex items-center justify-between">
-          <span className="text-sm text-gray-500">
-            Total ({items.length} {items.length === 1 ? "item" : "itens"})
-          </span>
-          <span className="text-lg font-bold text-gray-900">R$ {fmt(totalFinal)}</span>
-        </div>
-        {step === 1 ? (
-          <>
-            <div className="bg-rose-500/10 text-rose-600 font-semibold py-2 text-xs text-center">
-              O cupom expira em {timer}
+      {step === 1 && (
+        <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-40">
+          {descontos > 0 && (
+            <div className="bg-rose-50 text-rose-600 text-[13px] text-center py-2 px-3 flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5">
+              <Gift className="w-4 h-4 shrink-0" />
+              <span>
+                Você está economizando <strong>R$ {fmt(descontos)}</strong> neste pedido.
+              </span>
             </div>
-            <button
-              onClick={() => setStep(2)}
-              disabled={items.length === 0}
-              className="block w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3.5 text-sm disabled:opacity-50 uppercase tracking-wide"
-            >
-              Finalizar Compra
-            </button>
-          </>
-        ) : (
-          <div className="bg-rose-500 text-white font-bold py-3.5 text-sm text-center">
+          )}
+          <div className="max-w-3xl mx-auto px-4 py-2.5 flex items-center justify-between">
+            <span className="text-sm text-gray-500">
+              Total ({items.length} {items.length === 1 ? "item" : "itens"})
+            </span>
+            <span className="text-lg font-bold text-gray-900">R$ {fmt(totalFinal)}</span>
+          </div>
+          <button
+            onClick={() => setStep(2)}
+            disabled={items.length === 0}
+            className="block w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3.5 text-sm disabled:opacity-50 uppercase tracking-wide"
+          >
+            Finalizar Compra
+          </button>
+          <div className="bg-rose-500 text-white font-semibold py-2 text-xs text-center">
             O cupom expira em {timer}
           </div>
-        )}
-      </footer>
+        </footer>
+      )}
+
+      {variantModal && (
+        <VariantModal
+          bump={variantModal}
+          onClose={() => setVariantModal(null)}
+          onConfirm={(variant) => {
+            addBump(variantModal, variant);
+            setVariantModal(null);
+          }}
+        />
+      )}
     </div>
   );
 }
 
-/* ---------- Stepper ---------- */
+/* ---------- Step 1: Unified products list ---------- */
 
-function Stepper({ active }: { active: 1 | 2 | 3 }) {
-  const steps = [
-    { n: 1, label: "Identificação" },
-    { n: 2, label: "Entrega" },
-    { n: 3, label: "Pagamento" },
-  ];
+function Step1({
+  cartItems,
+  bumpsToShow,
+  updateQty,
+  onBumpClick,
+  getBumpCount,
+}: {
+  cartItems: CartItem[];
+  bumpsToShow: Bump[];
+  updateQty: (id: string, q: number) => void;
+  onBumpClick: (b: Bump) => void;
+  getBumpCount: (b: Bump) => number;
+}) {
   return (
-    <div className="flex items-center justify-between px-2 py-4">
-      {steps.map((s, i) => {
-        const done = active > s.n;
-        const current = active === s.n;
+    <div className="space-y-3 pt-1">
+      {cartItems.length === 0 && bumpsToShow.length === BUMPS.length && (
+        <div className="bg-white rounded-xl border border-gray-100 p-6 text-center text-sm text-gray-500">
+          Carrinho vazio.{" "}
+          <Link to="/" className="text-rose-600 font-semibold">
+            Ver ofertas
+          </Link>
+        </div>
+      )}
+
+      {cartItems.map((item) => {
+        const price = parsePrice(item.price);
+        const oldP = parsePrice((item as { old?: string }).old || "") || price * 8;
+        const off = Math.max(0, oldP - price);
         return (
-          <div key={s.n} className="flex items-center flex-1 last:flex-none">
-            <div className="flex flex-col items-center">
-              <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
-                  done
-                    ? "bg-emerald-500 text-white"
-                    : current
-                    ? "bg-slate-900 text-white"
-                    : "bg-gray-200 text-gray-400"
-                }`}
-              >
-                {done ? <Check className="w-5 h-5" /> : s.n}
+          <section
+            key={item.id}
+            className="bg-white shadow-sm border border-slate-200 rounded-xl px-4 py-4"
+          >
+            <div className="flex gap-3">
+              <div className="w-[90px] h-[90px] flex-shrink-0 rounded-lg border border-gray-200 bg-white flex items-center justify-center overflow-hidden">
+                <img src={item.img} alt={item.name} className="w-full h-full object-contain p-1" />
               </div>
-              <span
-                className={`text-xs mt-1 font-semibold ${
-                  current ? "text-slate-900" : done ? "text-emerald-600" : "text-gray-400"
-                }`}
-              >
-                {s.label}
-              </span>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-[15px] text-gray-900 leading-snug">{item.name}</h3>
+                <div className="text-xs text-gray-400 line-through mt-1">R$ {fmt(oldP)}</div>
+                <div className="flex items-baseline gap-2 mt-0.5">
+                  <span className="text-emerald-600 font-bold text-lg">R$ {fmt(price)}</span>
+                  <span className="text-emerald-600 text-sm font-semibold">
+                    (R$ {fmt(off)} OFF)
+                  </span>
+                </div>
+              </div>
             </div>
-            {i < steps.length - 1 && (
-              <div className={`h-px flex-1 mx-2 ${done ? "bg-emerald-500" : "bg-gray-200"}`} />
-            )}
+            <div className="flex items-center justify-between mt-3">
+              <QtyStepper qty={item.qty} onChange={(n) => updateQty(item.id, n)} />
+              <span className="text-sm text-gray-500">{item.qty} no carrinho</span>
+            </div>
+          </section>
+        );
+      })}
+
+      {bumpsToShow.map((b) => {
+        const count = getBumpCount(b);
+        const off = Math.max(0, b.old - b.price);
+        return (
+          <div key={b.id} className="space-y-2">
+            <section className="bg-white shadow-sm border border-slate-200 rounded-xl px-4 py-4">
+              <div className="flex gap-3">
+                <div className="w-[90px] h-[90px] flex-shrink-0 rounded-lg border border-gray-200 bg-white flex items-center justify-center overflow-hidden">
+                  <img src={b.img} alt={b.name} className="w-full h-full object-contain p-1" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-[15px] text-gray-900 leading-snug">{b.name}</h3>
+                  <div className="text-xs text-gray-400 line-through mt-1">R$ {fmt(b.old)}</div>
+                  <div className="flex items-baseline gap-2 mt-0.5">
+                    <span className="text-emerald-600 font-bold text-lg">R$ {fmt(b.price)}</span>
+                    <span className="text-emerald-600 text-sm font-semibold">
+                      (R$ {fmt(off)} OFF)
+                    </span>
+                  </div>
+                  {b.note && (
+                    <div className="text-emerald-700 text-sm font-semibold mt-1">{b.note}</div>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center justify-between mt-3">
+                <QtyStepper qty={1} onChange={() => {}} disabled />
+                <span className="text-sm text-gray-500">
+                  {count > 0 ? `${count} no carrinho` : "Nenhum no carrinho"}
+                </span>
+              </div>
+            </section>
+            <button
+              onClick={() => onBumpClick(b)}
+              className="w-full bg-teal-400 hover:bg-teal-500 text-white font-bold py-3 rounded-lg text-sm"
+            >
+              Adicionar item
+            </button>
           </div>
         );
       })}
+
+      {cartItems.length > 0 && (
+        <div className="bg-white shadow-sm border border-slate-200 rounded-xl px-4 py-4">
+          <h4 className="font-bold text-gray-900 mb-3">Forma de pagamento</h4>
+          <label className="flex items-center gap-3 border-2 border-blue-500 rounded-lg px-3 py-3 cursor-pointer">
+            <img src={pixLogo} alt="PIX" className="w-10 h-10 object-contain" />
+            <span className="flex-1 font-semibold text-gray-900">PIX à vista</span>
+            <input
+              type="radio"
+              defaultChecked
+              readOnly
+              className="accent-blue-600 w-4 h-4"
+            />
+          </label>
+        </div>
+      )}
     </div>
   );
 }
 
-/* ---------- Step 1: Resumo ---------- */
-
-function Step1({
-  items,
-  total,
-  descontos,
-  frete,
-  shippingName,
-  totalFinal,
-  updateQty,
-  removeItem,
-  freeShipping,
+function QtyStepper({
+  qty,
+  onChange,
+  disabled,
 }: {
-  items: ReturnType<typeof useCart>["items"];
-  total: number;
-  descontos: number;
-  frete: number;
-  shippingName: string;
-  totalFinal: number;
-  updateQty: (id: string, q: number) => void;
-  removeItem: (id: string) => void;
-  freeShipping: boolean;
+  qty: number;
+  onChange: (n: number) => void;
+  disabled?: boolean;
 }) {
   return (
-    <>
-      <div className="text-sm font-medium text-gray-700 px-1 py-2">
-        Loja ({items.length} {items.length === 1 ? "item" : "itens"})
-      </div>
-
-      <div className="bg-sky-50 rounded-xl flex items-center gap-3 px-4 py-3 mb-3">
-        <Truck className="w-6 h-6 text-sky-800" />
-        <span className="text-sky-900 font-bold text-base">
-          {freeShipping
-            ? "Você ganhou frete grátis!"
-            : `Faltam R$ ${fmt(FREE_SHIPPING_MIN - total)} para o frete grátis`}
-        </span>
-      </div>
-
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
-        <h3 className="px-4 pt-4 pb-2 font-bold text-gray-900">
-          Resumo do carrinho ({items.length} {items.length === 1 ? "item" : "itens"})
-        </h3>
-        <div className="px-3 pb-3 space-y-3">
-          {items.map((item) => {
-            const price = parsePrice(item.price);
-            const oldP = parsePrice((item as any).old || "") || price * 8;
-            const subtotal = price * item.qty;
-            return (
-              <div key={item.id} className="border border-gray-200 rounded-xl p-3">
-                <div className="flex gap-3">
-                  <div className="w-[88px] h-[88px] flex-shrink-0 rounded-lg border border-gray-200 bg-white flex items-center justify-center overflow-hidden">
-                    <img src={item.img} alt={item.name} className="w-full h-full object-contain p-1" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <h4 className="font-bold text-[15px] text-gray-900 leading-tight">{item.name}</h4>
-                      <button onClick={() => removeItem(item.id)} className="text-gray-400" aria-label="Remover">
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                    <div className="flex items-center gap-1.5 mt-1.5">
-                      <span className="bg-rose-100 text-rose-600 text-xs font-bold px-2 py-0.5 rounded">- 87%</span>
-                      <span className="bg-emerald-50 text-emerald-600 text-xs font-semibold px-2 py-0.5 rounded">Frete grátis</span>
-                    </div>
-                    <div className="flex items-end justify-between mt-2">
-                      <div className="leading-tight">
-                        <div className="text-lg font-bold text-gray-900">R$ {fmt(price)}</div>
-                        <div className="text-xs text-gray-400 line-through">R$ {fmt(oldP)}</div>
-                      </div>
-                      <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-2 py-1">
-                        <button onClick={() => updateQty(item.id, item.qty - 1)} className="w-6 h-6 text-gray-600" aria-label="Diminuir">−</button>
-                        <span className="w-5 text-center text-sm font-semibold">{item.qty}</span>
-                        <button onClick={() => updateQty(item.id, item.qty + 1)} className="w-6 h-6 text-gray-600" aria-label="Aumentar">+</button>
-                      </div>
-                    </div>
-                    <div className="text-right text-sm font-bold text-gray-900 mt-2">
-                      Subtotal: R$ {fmt(subtotal)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-          {items.length === 0 && (
-            <div className="text-center text-sm text-gray-500 py-6">
-              Carrinho vazio. <Link to="/" className="text-rose-600 font-semibold">Ver ofertas</Link>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="bg-white border-t border-b border-gray-100 mt-3 px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Ticket className="w-5 h-5 text-rose-500" />
-          <span className="text-sm font-medium text-gray-800">Descontos aplicados</span>
-        </div>
-        <span className="text-sm font-bold text-rose-600 bg-rose-50 px-2 py-1 rounded">R$ {fmt(descontos)}</span>
-      </div>
-
-      <div className="bg-white px-4 py-4 mt-3 rounded-xl border border-gray-100">
-        <h4 className="font-bold text-gray-900 mb-3">Resumo financeiro</h4>
-        <div className="space-y-2 text-sm">
-          <Row label="Subtotal" value={`R$ ${fmt(total)}`} />
-          <Row
-            label={<span className="text-rose-600 font-semibold">Descontos</span>}
-            value={<span className="text-rose-600 font-semibold">R$ {fmt(descontos)}</span>}
-          />
-          <Row
-            label="Frete"
-            value={frete === 0 ? <span className="text-emerald-600 font-semibold">Grátis</span> : `${shippingName} (R$ ${fmt(frete)})`}
-          />
-        </div>
-        <div className="border-t border-gray-100 mt-3 pt-3 flex items-center justify-between">
-          <span className="font-bold text-gray-900">Total</span>
-          <span className="font-bold text-gray-900 text-lg">R$ {fmt(totalFinal)}</span>
-        </div>
-      </div>
-    </>
+    <div className="flex items-center border border-gray-200 rounded-md overflow-hidden">
+      <button
+        onClick={() => !disabled && onChange(qty - 1)}
+        disabled={disabled}
+        className="w-9 h-9 text-gray-600 disabled:text-gray-300"
+        aria-label="Diminuir"
+      >
+        −
+      </button>
+      <span className="w-8 text-center text-sm font-semibold">{qty}</span>
+      <button
+        onClick={() => !disabled && onChange(qty + 1)}
+        disabled={disabled}
+        className="w-9 h-9 text-gray-600 disabled:text-gray-300"
+        aria-label="Aumentar"
+      >
+        +
+      </button>
+    </div>
   );
 }
 
-function Row({ label, value }: { label: React.ReactNode; value: React.ReactNode }) {
+/* ---------- Variant modal (for caixinha) ---------- */
+
+function VariantModal({
+  bump,
+  onClose,
+  onConfirm,
+}: {
+  bump: Bump;
+  onClose: () => void;
+  onConfirm: (variant: string) => void;
+}) {
+  const [variant, setVariant] = useState("");
   return (
-    <div className="flex justify-between text-gray-700">
-      <span>{label}</span>
-      <span>{value}</span>
+    <div
+      className="fixed inset-0 bg-black/40 z-[80] flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-xl w-full max-w-md p-5"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex gap-3 items-start">
+          <div className="w-20 h-20 rounded-lg border border-gray-200 overflow-hidden flex-shrink-0">
+            <img src={bump.img} alt={bump.name} className="w-full h-full object-contain" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="font-bold text-[15px] text-gray-900 leading-tight">{bump.name}</h4>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-emerald-600 font-bold text-lg">R$ {fmt(bump.price)}</span>
+              <span className="text-gray-400 line-through text-sm">R$ {fmt(bump.old)}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <label className="block font-semibold text-gray-900 text-sm mb-2">Cor</label>
+          <div className="relative">
+            <select
+              value={variant}
+              onChange={(e) => setVariant(e.target.value)}
+              className="w-full h-12 rounded-lg border-2 border-blue-500 bg-blue-50/30 px-3 text-sm appearance-none focus:outline-none"
+            >
+              <option value="">Selecione a cor...</option>
+              {(bump.variants ?? []).map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-2 mt-5">
+          <button
+            onClick={onClose}
+            className="px-4 h-11 rounded-lg bg-gray-100 text-gray-700 font-semibold text-sm"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={() => variant && onConfirm(variant)}
+            disabled={!variant}
+            className="px-5 h-11 rounded-lg bg-teal-500 hover:bg-teal-600 disabled:opacity-50 text-white font-bold text-sm"
+          >
+            Adicionar ao carrinho
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -376,196 +503,53 @@ function Step2({ initial, onNext }: { initial: Customer; onNext: (c: Customer) =
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 mt-2">
-      <Stepper active={1} />
-      <form onSubmit={submit} className="px-4 pb-5 space-y-4">
+    <div className="bg-white rounded-xl border border-gray-100 mt-2 p-4">
+      <h2 className="font-bold text-gray-900 text-lg mb-4">Identificação</h2>
+      <form onSubmit={submit} className="space-y-4">
         <Field label="E-mail">
-          <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} maxLength={255} className={inputCls} />
+          <input
+            type="email"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            maxLength={255}
+            className={inputCls}
+          />
         </Field>
         <Field label="Telefone">
-          <input inputMode="numeric" placeholder="(99) 99999-9999" value={form.phone} onChange={(e) => setForm({ ...form, phone: maskPhone(e.target.value) })} className={inputCls} />
+          <input
+            inputMode="numeric"
+            placeholder="(99) 99999-9999"
+            value={form.phone}
+            onChange={(e) => setForm({ ...form, phone: maskPhone(e.target.value) })}
+            className={inputCls}
+          />
         </Field>
         <Field label="Nome completo">
-          <input placeholder="Nome e Sobrenome" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} maxLength={120} className={inputCls} />
+          <input
+            placeholder="Nome e Sobrenome"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            maxLength={120}
+            className={inputCls}
+          />
         </Field>
         <Field label="CPF/CNPJ">
-          <input inputMode="numeric" placeholder="000.000.000-00" value={form.cpf} onChange={(e) => setForm({ ...form, cpf: maskCpf(e.target.value) })} className={inputCls} />
+          <input
+            inputMode="numeric"
+            placeholder="000.000.000-00"
+            value={form.cpf}
+            onChange={(e) => setForm({ ...form, cpf: maskCpf(e.target.value) })}
+            className={inputCls}
+          />
         </Field>
-
-        <div className="border border-dashed border-gray-300 rounded-lg p-4">
-          <h4 className="font-bold text-gray-900 text-sm mb-2">Por que precisamos desses dados?</h4>
-          <ul className="list-disc pl-5 text-sm text-gray-700 space-y-1">
-            <li>Enviar o comprovante de compra;</li>
-            <li>Garantir a devolução caso necessário;</li>
-            <li>Acompanhar o andamento do pedido.</li>
-          </ul>
-        </div>
 
         {error && <div className="text-sm text-rose-600 text-center">{error}</div>}
 
-        <button type="submit" className="w-full h-12 rounded-lg bg-slate-900 text-white font-bold text-base">
-          Ir para entrega
-        </button>
-      </form>
-    </div>
-  );
-}
-
-/* ---------- Step 3: Entrega ---------- */
-
-function Step3({
-  options,
-  value,
-  onChange,
-  freeShipping,
-  onNext,
-}: {
-  options: ShippingOption[];
-  value: string;
-  onChange: (id: string) => void;
-  freeShipping: boolean;
-  onNext: () => void;
-}) {
-  const [form, setForm] = useState({
-    cep: "",
-    address: "",
-    number: "",
-    district: "",
-    city: "",
-    state: "",
-    complement: "",
-  });
-  const [error, setError] = useState<string | null>(null);
-  const [cepLoading, setCepLoading] = useState(false);
-
-  const maskCep = (v: string) => {
-    const d = v.replace(/\D/g, "").slice(0, 8);
-    return d.length > 5 ? `${d.slice(0, 5)}-${d.slice(5)}` : d;
-  };
-
-  const handleCepChange = async (raw: string) => {
-    const masked = maskCep(raw);
-    setForm((f) => ({ ...f, cep: masked }));
-    const digits = masked.replace(/\D/g, "");
-    if (digits.length === 8) {
-      setCepLoading(true);
-      setError(null);
-      try {
-        const res = await fetch(`https://viacep.com.br/ws/${digits}/json/`);
-        const data = await res.json();
-        if (data.erro) {
-          setError("CEP não encontrado");
-        } else {
-          setForm((f) => ({
-            ...f,
-            address: data.logradouro || f.address,
-            district: data.bairro || f.district,
-            city: data.localidade || f.city,
-            state: (data.uf || f.state).toUpperCase(),
-          }));
-        }
-      } catch {
-        setError("Não foi possível buscar o CEP");
-      } finally {
-        setCepLoading(false);
-      }
-    }
-  };
-
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (form.cep.replace(/\D/g, "").length !== 8) return setError("CEP inválido");
-    if (!form.address.trim()) return setError("Informe o endereço");
-    if (!form.number.trim()) return setError("Informe o número");
-    if (!form.district.trim()) return setError("Informe o bairro");
-    if (!form.city.trim()) return setError("Informe a cidade");
-    if (!form.state.trim()) return setError("Informe o estado");
-    setError(null);
-    onNext();
-  };
-
-
-  const selected = options.find((o) => o.id === value) || options[0];
-
-  return (
-    <div className="bg-white rounded-xl border border-gray-100 mt-2">
-      <Stepper active={2} />
-      <form onSubmit={submit} className="px-4 pb-5 space-y-4">
-        <Field label="CEP">
-          <div className="relative">
-            <input inputMode="numeric" placeholder="00000-000" value={form.cep} onChange={(e) => handleCepChange(e.target.value)} className={inputCls} />
-            {cepLoading && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">buscando…</span>}
-          </div>
-        </Field>
-
-        <Field label="Endereço">
-          <input placeholder="Rua / Avenida" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} maxLength={200} className={inputCls} />
-        </Field>
-        <Field label="Número">
-          <input value={form.number} onChange={(e) => setForm({ ...form, number: e.target.value })} maxLength={10} className={inputCls} />
-        </Field>
-        <Field label="Bairro">
-          <input value={form.district} onChange={(e) => setForm({ ...form, district: e.target.value })} maxLength={100} className={inputCls} />
-        </Field>
-        <Field label="Cidade">
-          <input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} maxLength={100} className={inputCls} />
-        </Field>
-        <Field label="Estado">
-          <input value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} maxLength={2} className={inputCls} />
-        </Field>
-        <Field label="Complemento">
-          <input placeholder="Apartamento, bloco, referência (opcional)" value={form.complement} onChange={(e) => setForm({ ...form, complement: e.target.value })} maxLength={120} className={inputCls} />
-        </Field>
-
-        {freeShipping && (
-          <div className="bg-emerald-50 text-emerald-700 text-sm font-semibold rounded-lg px-3 py-2 flex items-center gap-2">
-            <Truck className="w-4 h-4" />
-            Você atingiu o mínimo de R$ {fmt(FREE_SHIPPING_MIN)} — frete grátis aplicado!
-          </div>
-        )}
-
-        <div className="space-y-2">
-          {options.map((o) => {
-            const active = o.id === value;
-            return (
-              <label
-                key={o.id}
-                className={`flex items-center gap-3 border rounded-lg px-3 py-3 cursor-pointer ${
-                  active ? "border-blue-500 bg-blue-50/30" : "border-gray-200"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="shipping"
-                  checked={active}
-                  onChange={() => onChange(o.id)}
-                  className="accent-blue-600 w-4 h-4"
-                />
-                <div className="flex-1">
-                  <div className="font-bold text-gray-900 text-sm">{o.name}</div>
-                  <div className="text-xs text-gray-500">{o.days}</div>
-                </div>
-                <div className="text-right">
-                  {o.oldPrice && o.price !== 0 && (
-                    <div className="text-[11px] text-gray-400 line-through leading-none">de R$ {fmt(o.oldPrice)}</div>
-                  )}
-                  <div className={`font-bold text-sm ${o.price === 0 ? "text-emerald-600" : "text-gray-900"}`}>
-                    {o.price === 0 ? "Grátis" : `R$ ${fmt(o.price)}`}
-                  </div>
-                </div>
-              </label>
-            );
-          })}
-        </div>
-
-        <div className="text-sm text-gray-700">
-          Frete selecionado: <strong>{selected.name}</strong> ({selected.price === 0 ? "Grátis" : `R$ ${fmt(selected.price)}`})
-        </div>
-
-        {error && <div className="text-sm text-rose-600 text-center">{error}</div>}
-
-        <button type="submit" className="w-full h-12 rounded-lg bg-slate-900 text-white font-bold text-base">
-          Ir para pagamento
+        <button
+          type="submit"
+          className="w-full h-12 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-base uppercase tracking-wide"
+        >
+          Gerar PIX
         </button>
       </form>
     </div>
@@ -584,49 +568,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 const inputCls =
   "w-full h-12 rounded-lg border border-gray-300 px-3 text-sm focus:outline-none focus:border-gray-900";
 
-/* ---------- Step 4: Pagamento + Order Bumps ---------- */
-
-type Bump = {
-  id: string;
-  name: string;
-  img: string;
-  price: number;
-  old: number;
-  off: number;
-  note?: string;
-  variants: string[];
-};
-
-const BUMPS: Bump[] = [
-  {
-    id: "bump-neymar",
-    name: "[Lançamento] Novo Lote Neymar Edition chance de 12%. aumente sua chance ao adicionar mais!",
-    img: bumpNeymar,
-    price: 11.9,
-    old: 31.9,
-    off: 20,
-    note: "Após adicionar 1x: 12% de sorte",
-    variants: ["Padrão"],
-  },
-  {
-    id: "bump-legend",
-    name: "Aumente suas chances para garantir Figurinhas Raras✨",
-    img: bumpLegend,
-    price: 19.7,
-    old: 39.58,
-    off: 19.88,
-    variants: ["Padrão"],
-  },
-  {
-    id: "bump-caixinha",
-    name: "Caixinha Temática Copa do Mundo 2026 - Capacidade até 500 Figurinhas",
-    img: bumpCaixinha,
-    price: 15.98,
-    old: 37.58,
-    off: 21.6,
-    variants: ["Preto", "Dourado"],
-  },
-];
+/* ---------- Step 4: PIX ---------- */
 
 type PixData = {
   id: string;
@@ -635,98 +577,80 @@ type PixData = {
 };
 
 function Step4({ customer, totalFinal }: { customer: Customer; totalFinal: number }) {
-  const { addItem, items, clear } = useCart();
-  const [modal, setModal] = useState<Bump | null>(null);
-  const [variant, setVariant] = useState("");
-  const [qtys, setQtys] = useState<Record<string, number>>({});
+  const { items, clear } = useCart();
   const [loading, setLoading] = useState(false);
   const [pix, setPix] = useState<PixData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const navigate = useNavigate();
 
-  const getQty = (id: string) => qtys[id] ?? 1;
-  const setQty = (id: string, n: number) => setQtys((q) => ({ ...q, [id]: Math.max(1, n) }));
-
-  const openAdd = (b: Bump) => {
-    setVariant("");
-    setModal(b);
-  };
-
-  const confirmAdd = () => {
-    if (!modal || !variant) return;
-    addItem(
-      {
-        id: `${modal.id}-${variant}`,
-        name: `${modal.name} — ${variant}`,
-        img: modal.img,
-        price: `R$ ${fmt(modal.price)}`,
-      },
-      getQty(modal.id),
-    );
-    setModal(null);
-  };
-
-  const finalize = async () => {
-    setError(null);
-    setLoading(true);
-
-    const eventId = (crypto as Crypto & { randomUUID: () => string }).randomUUID();
-    const value = totalFinal;
-    const contents = items.map((i) => ({
-      content_id: i.id,
-      content_name: i.name,
-      quantity: i.qty,
-      price: parsePrice(i.price),
-    }));
-
-    try {
-      const res = await fetch("/api/pix/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: value,
-          customerName: customer.name,
-          customerEmail: customer.email,
-          customerPhone: customer.phone,
-          customerDocument: customer.cpf,
-          description: `Pedido Panini Copa 2026 (${items.length} itens)`,
-          metadata: { event_id: eventId },
-        }),
-      });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok || !json?.data?.pix?.qrCode?.emv) {
-        throw new Error(json?.message || json?.error || "Falha ao gerar PIX");
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      setError(null);
+      setLoading(true);
+      const eventId = (crypto as Crypto & { randomUUID: () => string }).randomUUID();
+      const value = totalFinal;
+      const contents = items.map((i) => ({
+        content_id: i.id,
+        content_name: i.name,
+        quantity: i.qty,
+        price: parsePrice(i.price),
+      }));
+      try {
+        const res = await fetch("/api/pix/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount: value,
+            customerName: customer.name,
+            customerEmail: customer.email,
+            customerPhone: customer.phone,
+            customerDocument: customer.cpf,
+            description: `Pedido Panini Copa 2026 (${items.length} itens)`,
+            metadata: { event_id: eventId },
+          }),
+        });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || !json?.data?.pix?.qrCode?.emv) {
+          throw new Error(json?.message || json?.error || "Falha ao gerar PIX");
+        }
+        if (cancelled) return;
+        const ttq = (window as unknown as {
+          ttq?: { track: (e: string, p?: unknown, o?: unknown) => void };
+        }).ttq;
+        ttq?.track(
+          "CompletePayment",
+          { value, currency: "BRL", contents, content_type: "product" },
+          { event_id: eventId },
+        );
+        fetch("/api/tiktok-event", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            event: "CompletePayment",
+            event_id: eventId,
+            url: window.location.href,
+            value,
+            currency: "BRL",
+            email: customer.email,
+            phone: customer.phone,
+            contents,
+          }),
+        }).catch(() => {});
+        setPix(json.data as PixData);
+      } catch (e) {
+        if (!cancelled) setError(e instanceof Error ? e.message : "Erro ao gerar PIX");
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-
-      const ttq = (window as unknown as { ttq?: { track: (e: string, p?: unknown, o?: unknown) => void } }).ttq;
-      ttq?.track(
-        "CompletePayment",
-        { value, currency: "BRL", contents, content_type: "product" },
-        { event_id: eventId },
-      );
-      fetch("/api/tiktok-event", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          event: "CompletePayment",
-          event_id: eventId,
-          url: window.location.href,
-          value,
-          currency: "BRL",
-          email: customer.email,
-          phone: customer.phone,
-          contents,
-        }),
-      }).catch(() => {});
-
-      setPix(json.data as PixData);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Erro ao gerar PIX");
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+    run();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const copyEmv = async () => {
     if (!pix) return;
@@ -739,180 +663,72 @@ function Step4({ customer, totalFinal }: { customer: Customer; totalFinal: numbe
     }
   };
 
-  if (pix) {
-    const emv = pix.pix.qrCode.emv;
-    const img = pix.pix.qrCode.image
-      ? pix.pix.qrCode.image.startsWith("data:")
-        ? pix.pix.qrCode.image
-        : `data:image/png;base64,${pix.pix.qrCode.image}`
-      : `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(emv)}`;
+  if (loading) {
     return (
-      <div className="bg-white rounded-xl border border-gray-100 mt-2">
-        <div className="px-4 pt-5 pb-5 space-y-4 text-center">
-          <h3 className="font-bold text-gray-900 text-lg">Pague com PIX para concluir</h3>
-          <p className="text-sm text-gray-600">
-            Escaneie o QR Code ou copie o código abaixo. Valor: <strong>R$ {fmt(pix.amount)}</strong>
-          </p>
-          <div className="flex justify-center">
-            <img src={img} alt="QR Code PIX" className="w-64 h-64 border border-gray-200 rounded-lg" />
-          </div>
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-left">
-            <div className="text-xs font-semibold text-gray-500 mb-1">PIX Copia e Cola</div>
-            <div className="text-xs text-gray-800 break-all font-mono">{emv}</div>
-          </div>
-          <button
-            onClick={copyEmv}
-            className="w-full h-12 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-bold"
-          >
-            {copied ? "Código copiado!" : "Copiar código PIX"}
-          </button>
-          <p className="text-xs text-gray-500">
-            Após o pagamento, você receberá a confirmação por e-mail em <strong>{customer.email}</strong>.
-          </p>
-          <button
-            onClick={() => { clear(); navigate({ to: "/" }); }}
-            className="text-sm text-gray-500 underline"
-          >
-            Voltar ao início
-          </button>
-        </div>
+      <div className="bg-white rounded-xl border border-gray-100 mt-2 p-8 text-center">
+        <p className="text-gray-700 font-semibold">Gerando seu PIX...</p>
       </div>
     );
   }
 
+  if (error) {
+    return (
+      <div className="bg-white rounded-xl border border-gray-100 mt-2 p-6 text-center space-y-3">
+        <p className="text-rose-600 font-semibold">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-4 h-11 rounded-lg bg-rose-600 text-white font-bold text-sm"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
+  }
+
+  if (!pix) return null;
+
+  const emv = pix.pix.qrCode.emv;
+  const img = pix.pix.qrCode.image
+    ? pix.pix.qrCode.image.startsWith("data:")
+      ? pix.pix.qrCode.image
+      : `data:image/png;base64,${pix.pix.qrCode.image}`
+    : `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(emv)}`;
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 mt-2">
-      <Stepper active={3} />
-      <div className="px-4 pb-5 space-y-4">
-        <h3 className="text-center font-bold text-gray-900">Acho que você vai gostar destas ofertas ;)</h3>
-
-        {BUMPS.map((b) => {
-          const inCart = items
-            .filter((i) => i.id.startsWith(b.id + "-"))
-            .reduce((s, i) => s + i.qty, 0);
-          return (
-            <div key={b.id} className="space-y-2">
-              <div className="border border-dashed border-gray-300 rounded-xl p-3">
-                <div className="flex gap-3">
-                  <div className="w-[88px] h-[88px] flex-shrink-0 rounded-lg border border-gray-200 bg-white overflow-hidden">
-                    <img src={b.img} alt={b.name} className="w-full h-full object-contain" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-[15px] text-gray-900 leading-tight">{b.name}</h4>
-                    <div className="mt-1 flex items-baseline gap-2">
-                      <span className="text-gray-400 line-through text-sm">R$ {fmt(b.old)}</span>
-                    </div>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-emerald-600 font-bold text-lg">R$ {fmt(b.price)}</span>
-                      <span className="text-emerald-600 text-sm font-semibold">(R$ {fmt(b.off)} OFF)</span>
-                    </div>
-                    {b.note && <div className="text-emerald-700 text-sm font-semibold mt-1">{b.note}</div>}
-                  </div>
-                </div>
-                <div className="flex items-center justify-between mt-3">
-                  <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-2 py-1">
-                    <button onClick={() => setQty(b.id, getQty(b.id) - 1)} className="w-7 h-7 text-gray-600">−</button>
-                    <span className="w-6 text-center text-sm font-semibold">{getQty(b.id)}</span>
-                    <button onClick={() => setQty(b.id, getQty(b.id) + 1)} className="w-7 h-7 text-gray-600">+</button>
-                  </div>
-                  <span className="text-sm text-gray-500">
-                    {inCart > 0 ? `${inCart} no carrinho` : "Nenhum no carrinho"}
-                  </span>
-                </div>
-              </div>
-              <button
-                onClick={() => openAdd(b)}
-                className="w-full bg-teal-400 hover:bg-teal-500 text-white font-bold py-3 rounded-lg text-sm"
-              >
-                Adicionar item
-              </button>
-            </div>
-          );
-        })}
-
-        <div className="border border-gray-200 rounded-xl p-4">
-          <h4 className="font-bold text-gray-900 mb-3">Forma de pagamento</h4>
-          <label className="flex items-center gap-3 border border-gray-200 rounded-lg px-3 py-3">
-            <div className="w-9 h-9 rounded-md bg-teal-100 flex items-center justify-center text-teal-500 font-bold">
-              PIX
-            </div>
-            <span className="flex-1 font-semibold text-gray-900">PIX à vista</span>
-            <input type="radio" defaultChecked className="accent-blue-600 w-4 h-4" />
-          </label>
+      <div className="px-4 pt-5 pb-5 space-y-4 text-center">
+        <h3 className="font-bold text-gray-900 text-lg">Pague com PIX para concluir</h3>
+        <p className="text-sm text-gray-600">
+          Escaneie o QR Code ou copie o código abaixo. Valor:{" "}
+          <strong>R$ {fmt(pix.amount)}</strong>
+        </p>
+        <div className="flex justify-center">
+          <img src={img} alt="QR Code PIX" className="w-64 h-64 border border-gray-200 rounded-lg" />
         </div>
-
-        {error && <div className="text-sm text-rose-600 text-center">{error}</div>}
-
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-left">
+          <div className="text-xs font-semibold text-gray-500 mb-1">PIX Copia e Cola</div>
+          <div className="text-xs text-gray-800 break-all font-mono">{emv}</div>
+        </div>
         <button
-          onClick={finalize}
-          disabled={loading || items.length === 0}
-          className="w-full h-12 rounded-lg bg-rose-500 hover:bg-rose-600 disabled:opacity-60 text-white font-bold text-base tracking-wide"
+          onClick={copyEmv}
+          className="w-full h-12 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-bold"
         >
-          {loading ? "Gerando PIX..." : "FINALIZAR COMPRA"}
+          {copied ? "Código copiado!" : "Copiar código PIX"}
+        </button>
+        <p className="text-xs text-gray-500">
+          Após o pagamento, você receberá a confirmação por e-mail em{" "}
+          <strong>{customer.email}</strong>.
+        </p>
+        <button
+          onClick={() => {
+            clear();
+            navigate({ to: "/" });
+          }}
+          className="text-sm text-gray-500 underline"
+        >
+          Voltar ao início
         </button>
       </div>
-
-      {/* Modal de variação */}
-      {modal && (
-        <div
-          className="fixed inset-0 bg-black/40 z-[80] flex items-center justify-center p-4"
-          onClick={() => setModal(null)}
-        >
-          <div
-            className="bg-white rounded-xl w-full max-w-md p-5"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex gap-3 items-start">
-              <div className="w-20 h-20 rounded-lg border border-gray-200 overflow-hidden flex-shrink-0">
-                <img src={modal.img} alt={modal.name} className="w-full h-full object-contain" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="font-bold text-[15px] text-gray-900 leading-tight">{modal.name}</h4>
-                <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-emerald-600 font-bold text-lg">R$ {fmt(modal.price)}</span>
-                  <span className="text-gray-400 line-through text-sm">R$ {fmt(modal.old)}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-4">
-              <label className="block font-semibold text-gray-900 text-sm mb-2">Cor</label>
-              <div className="relative">
-                <select
-                  value={variant}
-                  onChange={(e) => setVariant(e.target.value)}
-                  className="w-full h-12 rounded-lg border-2 border-blue-500 bg-blue-50/30 px-3 text-sm appearance-none focus:outline-none"
-                >
-                  <option value="">Selecione a cor...</option>
-                  {modal.variants.map((v) => (
-                    <option key={v} value={v}>
-                      {v}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-2 mt-5">
-              <button
-                onClick={() => setModal(null)}
-                className="px-4 h-11 rounded-lg border border-gray-300 text-gray-700 font-semibold"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={confirmAdd}
-                disabled={!variant}
-                className="px-5 h-11 rounded-lg bg-teal-400 hover:bg-teal-500 text-white font-bold disabled:opacity-60"
-              >
-                Quero esse item
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
