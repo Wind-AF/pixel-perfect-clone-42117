@@ -444,7 +444,7 @@ function Step3({
     if (!form.city.trim()) return setError("Informe a cidade");
     if (!form.state.trim()) return setError("Informe o estado");
     setError(null);
-    alert("Próximo passo: pagamento (a implementar)");
+    onNext();
   };
 
   const selected = options.find((o) => o.id === value) || options[0];
