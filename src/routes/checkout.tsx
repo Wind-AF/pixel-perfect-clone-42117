@@ -543,8 +543,13 @@ function Step3({
                   <div className="font-bold text-gray-900 text-sm">{o.name}</div>
                   <div className="text-xs text-gray-500">{o.days}</div>
                 </div>
-                <div className="font-bold text-gray-900 text-sm">
-                  {o.price === 0 ? "Grátis" : `R$ ${fmt(o.price)}`}
+                <div className="text-right">
+                  {o.oldPrice && o.price !== 0 && (
+                    <div className="text-[11px] text-gray-400 line-through leading-none">de R$ {fmt(o.oldPrice)}</div>
+                  )}
+                  <div className={`font-bold text-sm ${o.price === 0 ? "text-emerald-600" : "text-gray-900"}`}>
+                    {o.price === 0 ? "Grátis" : `R$ ${fmt(o.price)}`}
+                  </div>
                 </div>
               </label>
             );
