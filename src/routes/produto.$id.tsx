@@ -281,28 +281,40 @@ function ProdutoPage() {
           </span>
         </div>
 
-        <div className="border-t border-gray-100 pt-3">
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-8 h-8 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center text-xs font-bold">G</div>
-            <div className="flex flex-col">
-              <span className="text-xs font-semibold">Gabriel Ferreira</span>
-              <span className="text-[10px] text-teal-500">2026-05-17 23:32:27</span>
+        {[
+          { name: "Gabriel Ferreira", avatar: null, initial: "G", date: "2026-05-17 23:32:27", text: "Gostei demais da compra, qualidade excelente e quantidade certinha. Pra quem curte coleção vale muito a pena 🔥", photos: reviewPhotos },
+          { name: "Juan Pablo", avatar: reviewerJuan, date: "2026-05-14 18:05:11", text: "Chegou rapidinho e bem embalado. Recomendo demais, qualidade muito boa!" },
+          { name: "Joyce Almeida", avatar: reviewerJoyce, date: "2026-05-10 09:22:48", text: "Amei! Superou minhas expectativas, virei cliente fiel da loja ❤️" },
+          { name: "José Henrique", avatar: reviewerJose, date: "2026-05-06 14:47:02", text: "Produto top, valor justo e entrega antes do prazo. Já comprei de novo!" },
+          { name: "Júlia & Rafael", avatar: reviewerJuliaRafael, date: "2026-05-02 21:13:55", text: "A gente comprou pra usar junto e amamos! Qualidade impecável, vale cada centavo." },
+        ].map((r, idx) => (
+          <div key={r.name} className={`pt-3 ${idx === 0 ? "border-t border-gray-100" : "border-t border-gray-100 mt-3"}`}>
+            <div className="flex items-center gap-2 mb-1">
+              {r.avatar ? (
+                <img src={r.avatar} alt={r.name} className="w-8 h-8 rounded-full object-cover" />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center text-xs font-bold">{r.initial}</div>
+              )}
+              <div className="flex flex-col">
+                <span className="text-xs font-semibold">{r.name}</span>
+                <span className="text-[10px] text-teal-500">{r.date}</span>
+              </div>
             </div>
+            <div className="flex mb-1">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+              ))}
+            </div>
+            <p className="text-xs leading-relaxed">{r.text}</p>
+            {r.photos && (
+              <div className="grid grid-cols-3 gap-1.5 mt-2">
+                {r.photos.map((src, i) => (
+                  <img key={i} src={src} alt={`Foto ${i + 1}`} className="aspect-square w-full object-cover rounded-md" />
+                ))}
+              </div>
+            )}
           </div>
-          <div className="flex mb-1">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-            ))}
-          </div>
-          <p className="text-xs leading-relaxed">
-            Gostei demais da compra, qualidade excelente e quantidade certinha. Pra quem curte coleção vale muito a pena 🔥
-          </p>
-          <div className="grid grid-cols-3 gap-1.5 mt-2">
-            {reviewPhotos.map((src, i) => (
-              <img key={i} src={src} alt={`Foto ${i + 1}`} className="aspect-square w-full object-cover rounded-md" />
-            ))}
-          </div>
-        </div>
+        ))}
       </section>
 
       {/* Mais desta loja */}
