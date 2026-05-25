@@ -628,11 +628,21 @@ const BUMPS: Bump[] = [
   },
 ];
 
-function Step4() {
-  const { addItem, items } = useCart();
+type PixData = {
+  id: string;
+  amount: number;
+  pix: { qrCode: { emv: string; image?: string }; expirationDate?: number };
+};
+
+function Step4({ customer, totalFinal }: { customer: Customer; totalFinal: number }) {
+  const { addItem, items, clear } = useCart();
   const [modal, setModal] = useState<Bump | null>(null);
   const [variant, setVariant] = useState("");
   const [qtys, setQtys] = useState<Record<string, number>>({});
+  const [loading, setLoading] = useState(false);
+  const [pix, setPix] = useState<PixData | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   const navigate = useNavigate();
 
   const getQty = (id: string) => qtys[id] ?? 1;
@@ -657,44 +667,119 @@ function Step4() {
     setModal(null);
   };
 
-  const finalize = () => {
+  const finalize = async () => {
+    setError(null);
+    setLoading(true);
+
     const eventId = (crypto as Crypto & { randomUUID: () => string }).randomUUID();
-    const value = items.reduce((s, i) => {
-      const n = Number(String(i.price).replace(/[^\d,.-]/g, "").replace(",", "."));
-      return s + (isNaN(n) ? 0 : n) * i.qty;
-    }, 0);
+    const value = totalFinal;
     const contents = items.map((i) => ({
       content_id: i.id,
       content_name: i.name,
       quantity: i.qty,
-      price: Number(String(i.price).replace(/[^\d,.-]/g, "").replace(",", ".")) || 0,
+      price: parsePrice(i.price),
     }));
 
-    // Client-side pixel
-    const ttq = (window as unknown as { ttq?: { track: (e: string, p?: unknown, o?: unknown) => void } }).ttq;
-    ttq?.track(
-      "CompletePayment",
-      { value, currency: "BRL", contents, content_type: "product" },
-      { event_id: eventId },
-    );
+    try {
+      const res = await fetch("/api/pix/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: value,
+          customerName: customer.name,
+          customerEmail: customer.email,
+          customerPhone: customer.phone,
+          customerDocument: customer.cpf,
+          description: `Pedido Panini Copa 2026 (${items.length} itens)`,
+          metadata: { event_id: eventId },
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json?.data?.pix?.qrCode?.emv) {
+        throw new Error(json?.message || json?.error || "Falha ao gerar PIX");
+      }
 
-    // Server-side Events API (deduplicated by event_id)
-    fetch("/api/tiktok-event", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        event: "CompletePayment",
-        event_id: eventId,
-        url: window.location.href,
-        value,
-        currency: "BRL",
-        contents,
-      }),
-    }).catch(() => {});
+      const ttq = (window as unknown as { ttq?: { track: (e: string, p?: unknown, o?: unknown) => void } }).ttq;
+      ttq?.track(
+        "CompletePayment",
+        { value, currency: "BRL", contents, content_type: "product" },
+        { event_id: eventId },
+      );
+      fetch("/api/tiktok-event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event: "CompletePayment",
+          event_id: eventId,
+          url: window.location.href,
+          value,
+          currency: "BRL",
+          email: customer.email,
+          phone: customer.phone,
+          contents,
+        }),
+      }).catch(() => {});
 
-    alert("Compra finalizada! 🎉");
-    navigate({ to: "/" });
+      setPix(json.data as PixData);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Erro ao gerar PIX");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const copyEmv = async () => {
+    if (!pix) return;
+    try {
+      await navigator.clipboard.writeText(pix.pix.qrCode.emv);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  if (pix) {
+    const emv = pix.pix.qrCode.emv;
+    const img = pix.pix.qrCode.image
+      ? pix.pix.qrCode.image.startsWith("data:")
+        ? pix.pix.qrCode.image
+        : `data:image/png;base64,${pix.pix.qrCode.image}`
+      : `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(emv)}`;
+    return (
+      <div className="bg-white rounded-xl border border-gray-100 mt-2">
+        <div className="px-4 pt-5 pb-5 space-y-4 text-center">
+          <h3 className="font-bold text-gray-900 text-lg">Pague com PIX para concluir</h3>
+          <p className="text-sm text-gray-600">
+            Escaneie o QR Code ou copie o código abaixo. Valor: <strong>R$ {fmt(pix.amount)}</strong>
+          </p>
+          <div className="flex justify-center">
+            <img src={img} alt="QR Code PIX" className="w-64 h-64 border border-gray-200 rounded-lg" />
+          </div>
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-left">
+            <div className="text-xs font-semibold text-gray-500 mb-1">PIX Copia e Cola</div>
+            <div className="text-xs text-gray-800 break-all font-mono">{emv}</div>
+          </div>
+          <button
+            onClick={copyEmv}
+            className="w-full h-12 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-bold"
+          >
+            {copied ? "Código copiado!" : "Copiar código PIX"}
+          </button>
+          <p className="text-xs text-gray-500">
+            Após o pagamento, você receberá a confirmação por e-mail em <strong>{customer.email}</strong>.
+          </p>
+          <button
+            onClick={() => { clear(); navigate({ to: "/" }); }}
+            className="text-sm text-gray-500 underline"
+          >
+            Voltar ao início
+          </button>
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 mt-2">
