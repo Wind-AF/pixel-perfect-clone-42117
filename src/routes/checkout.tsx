@@ -347,8 +347,8 @@ function Row({ label, value }: { label: React.ReactNode; value: React.ReactNode 
 
 /* ---------- Step 2: Identificação ---------- */
 
-function Step2({ onNext }: { onNext: () => void }) {
-  const [form, setForm] = useState({ email: "", phone: "", name: "", cpf: "" });
+function Step2({ initial, onNext }: { initial: Customer; onNext: (c: Customer) => void }) {
+  const [form, setForm] = useState<Customer>(initial);
   const [error, setError] = useState<string | null>(null);
 
   const maskPhone = (v: string) => {
@@ -372,7 +372,7 @@ function Step2({ onNext }: { onNext: () => void }) {
     if (form.name.trim().split(" ").length < 2) return setError("Informe nome e sobrenome");
     if (form.cpf.replace(/\D/g, "").length !== 11) return setError("CPF inválido");
     setError(null);
-    onNext();
+    onNext(form);
   };
 
   return (
