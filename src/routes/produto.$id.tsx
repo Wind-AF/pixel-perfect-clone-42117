@@ -437,15 +437,19 @@ function ProdutoPage() {
 
       {/* Sticky bottom CTA */}
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[500px] bg-white border-t border-gray-200 px-3 py-2 flex items-center gap-2 z-40">
-        <button className="flex flex-col items-center justify-center text-[10px] text-gray-600 w-12">
-          <img src={carrinho2} alt="" width={22} height={22} />
+        <button className="flex flex-col items-center justify-center text-[10px] text-gray-600 w-10">
+          <Home className="w-5 h-5" strokeWidth={1.8} />
+          <span className="mt-0.5">Loja</span>
         </button>
-        <button className="flex-1 h-11 rounded-l-full bg-amber-400 text-white text-sm font-bold flex items-center justify-center gap-1">
-          <img src={bilhete2} alt="" width={16} height={16} style={{ filter: "brightness(0) invert(1)" }} />
-          Adicionar ao carrinho
+        <button className="flex flex-col items-center justify-center text-[10px] text-gray-600 w-10">
+          <MessageCircle className="w-5 h-5" strokeWidth={1.8} />
+          <span className="mt-0.5">Chat</span>
         </button>
-        <button className="flex-1 h-11 rounded-r-full bg-rose-500 text-white text-sm font-bold">
-          Comprar agora
+        <button className="flex-1 h-11 rounded-full bg-gray-100 text-gray-800 text-sm font-bold flex items-center justify-center px-2 text-center leading-tight">
+          Adicionar ao Carrinho
+        </button>
+        <button className="flex-1 h-11 rounded-full bg-rose-500 text-white text-sm font-bold">
+          Comprar Agora
         </button>
       </div>
 
