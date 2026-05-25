@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { ChevronLeft, Search, ChevronRight, List, ArrowDownAZ } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ChevronLeft, Search, ChevronRight, List, ArrowDownAZ, X } from "lucide-react";
 import logo from "@/assets/logo.webp";
 import bilhete from "@/assets/bilhete.png";
 import carrinho from "@/assets/carrinho.png";
