@@ -35,7 +35,7 @@ function useCountdown(seconds: number) {
   return `${hh}:${mm}:${ss}`;
 }
 
-type Step = 1 | 2 | 3;
+type Step = 1 | 2 | 3 | 4;
 
 function CheckoutPage() {
   const navigate = useNavigate();
