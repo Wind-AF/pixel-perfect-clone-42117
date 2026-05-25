@@ -51,6 +51,29 @@ export function useCart() {
     write(current);
   };
 
+  const removeItem = (id: string) => {
+    write(read().filter((i) => i.id !== id));
+  };
+
+  const updateQty = (id: string, qty: number) => {
+    if (qty <= 0) {
+      removeItem(id);
+      return;
+    }
+    const current = read();
+    const idx = current.findIndex((i) => i.id === id);
+    if (idx >= 0) {
+      current[idx].qty = qty;
+      write(current);
+    }
+  };
+
+  const clear = () => write([]);
+
+  const parsePrice = (p: string) =>
+    Number(p.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".")) || 0;
+
+  const total = items.reduce((s, i) => s + parsePrice(i.price) * i.qty, 0);
   const count = items.reduce((s, i) => s + i.qty, 0);
-  return { items, count, addItem };
+  return { items, count, total, addItem, removeItem, updateQty, clear };
 }
