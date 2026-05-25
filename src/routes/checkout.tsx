@@ -125,8 +125,10 @@ function CheckoutPage() {
             value={shippingId}
             onChange={setShippingId}
             freeShipping={freeShipping}
+            onNext={() => setStep(4)}
           />
         )}
+        {step === 4 && <Step4 />}
       </main>
 
       {/* Footer */}
