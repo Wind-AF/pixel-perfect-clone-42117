@@ -1,0 +1,276 @@
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { useState } from "react";
+import { ChevronLeft, ChevronRight, Shield, Truck, Check, Star, Video } from "lucide-react";
+import { getProduct, products } from "@/data/products";
+import carrinho from "@/assets/carrinho.png";
+import carrinho2 from "@/assets/carrinho-2.png";
+import compartilhar from "@/assets/compartilhar.png";
+import bilhete from "@/assets/bilhete.png";
+import bilhete2 from "@/assets/bilhete-2.png";
+import setaCima from "@/assets/seta-cima.png";
+import creatorAndre from "@/assets/creator-andre.jpg";
+import creatorCarla from "@/assets/creator-carla.jpg";
+import creatorCalifornices from "@/assets/creator-californices.jpg";
+import reviewFoto1 from "@/assets/review-foto-1.png";
+import reviewFoto2 from "@/assets/review-foto-2.png";
+import reviewFoto3 from "@/assets/review-foto-3.jpg";
+
+export const Route = createFileRoute("/produto/$id")({
+  component: ProdutoPage,
+  notFoundComponent: () => (
+    <div className="p-8 text-center">
+      Produto não encontrado.{" "}
+      <Link to="/" className="text-rose-600 underline">Voltar</Link>
+    </div>
+  ),
+});
+
+const creators = [
+  { name: "Carla Maria", img: creatorCarla },
+  { name: "Califórnices", img: creatorCalifornices },
+  { name: "Andre Arthur", img: creatorAndre },
+];
+
+const reviewPhotos = [reviewFoto1, reviewFoto2, reviewFoto3];
+
+function ProdutoPage() {
+  const { id } = Route.useParams();
+  const router = useRouter();
+  const product = getProduct(id);
+  const [imgIdx, setImgIdx] = useState(0);
+  const [saved, setSaved] = useState(false);
+
+  if (!product) {
+    return (
+      <div className="p-8 text-center">
+        Produto não encontrado.{" "}
+        <Link to="/" className="text-rose-600 underline">Voltar</Link>
+      </div>
+    );
+  }
+
+  // For now only one image per product; placeholder array prepared for when user adds more.
+  const images = [product.img];
+
+  return (
+    <div className="min-h-screen bg-white text-gray-800 text-sm max-w-[500px] mx-auto shadow-sm pb-24">
+      {/* Header */}
+      <header className="sticky top-0 z-30 bg-white border-b border-gray-200">
+        <div className="flex items-center justify-between p-3">
+          <button onClick={() => router.history.back()} aria-label="Voltar" className="text-gray-700">
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <div className="flex-1" />
+          <div className="flex items-center gap-4 mr-1">
+            <button aria-label="Compartilhar">
+              <img src={compartilhar} alt="" width={20} height={20} />
+            </button>
+            <button aria-label="Carrinho" className="relative">
+              <img src={carrinho} alt="" width={20} height={20} />
+              <span className="absolute -top-2 -right-3 flex w-4 h-4 bg-rose-500 text-white items-center justify-center rounded-full text-[9px] font-bold">0</span>
+            </button>
+            <button aria-label="Denunciar" className="text-gray-700 text-xl leading-none">⋯</button>
+          </div>
+        </div>
+      </header>
+
+      {/* Product image carousel */}
+      <section className="relative bg-white">
+        <div className="aspect-square w-full bg-white overflow-hidden relative">
+          <img src={images[imgIdx]} alt={product.name} className="w-full h-full object-contain" />
+          <span className="absolute bottom-3 right-3 bg-black/50 text-white text-[11px] px-2 py-0.5 rounded-full">
+            {imgIdx + 1}/{images.length}
+          </span>
+          {images.length > 1 && (
+            <>
+              <button onClick={() => setImgIdx((i) => (i - 1 + images.length) % images.length)} className="absolute left-2 top-1/2 -translate-y-1/2 text-xl bg-white/60 rounded-full w-7 h-7 flex items-center justify-center">←</button>
+              <button onClick={() => setImgIdx((i) => (i + 1) % images.length)} className="absolute right-2 top-1/2 -translate-y-1/2 text-xl bg-white/60 rounded-full w-7 h-7 flex items-center justify-center">→</button>
+            </>
+          )}
+        </div>
+        <div className="flex justify-center gap-1.5 py-2">
+          {images.map((_, i) => (
+            <span key={i} className={`w-2 h-2 rounded-full ${i === imgIdx ? "bg-rose-500" : "bg-gray-300"}`} />
+          ))}
+        </div>
+      </section>
+
+      {/* Price banner */}
+      <section className="px-4 py-2.5" style={{ background: "linear-gradient(90deg,#ff2d55,#ff5e7c)" }}>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <span className="bg-white text-rose-500 text-[11px] font-bold px-1.5 py-0.5 rounded">-{60}.00%</span>
+              <span className="text-white font-bold text-lg leading-none">{product.price}</span>
+              <img src={bilhete} alt="" width={18} height={18} style={{ filter: "brightness(0) invert(1)" }} />
+            </div>
+            <span className="text-white/70 text-xs line-through mt-1">{product.old}</span>
+          </div>
+          <div className="flex flex-col items-end">
+            <div className="flex items-center gap-1 text-white text-[11px] font-semibold">
+              ⚡ Oferta Relâmpago
+            </div>
+            <span className="text-white/90 text-xs font-semibold mt-0.5">Termina em 04:43</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Coupons */}
+      <section className="px-2 py-1.5 bg-white">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide items-center">
+          <img src={bilhete} alt="" width={14} height={14} style={{ filter: "brightness(0) saturate(100%) invert(28%) sepia(94%) saturate(2913%) hue-rotate(330deg) brightness(95%) contrast(101%)" }} />
+          <span className="bg-rose-50 text-rose-500 text-[11px] font-bold px-2.5 py-1 rounded whitespace-nowrap">Desconto de 15%, máximo de R$35</span>
+          <span className="bg-rose-50 text-rose-500 text-[11px] font-bold px-2.5 py-1 rounded whitespace-nowrap">Cupom válido p/ compras acima R$100</span>
+          <span className="bg-rose-50 text-rose-500 text-[11px] font-bold px-2.5 py-1 rounded whitespace-nowrap flex items-center gap-1">Economize 6% <ChevronRight className="w-3 h-3" /></span>
+        </div>
+      </section>
+
+      {/* Product info */}
+      <section className="px-4 pt-2 pb-1">
+        <div className="flex justify-between items-start gap-3">
+          <h1 className="flex-1 text-base font-semibold leading-tight">{product.name}</h1>
+          <button onClick={() => setSaved((v) => !v)} aria-label="Salvar" className="p-1">
+            <img src={setaCima} alt="" width={22} height={22} className={saved ? "opacity-100" : "opacity-60"} />
+          </button>
+        </div>
+        <div className="flex items-center gap-1 mt-1">
+          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+          <span className="text-xs text-gray-500">
+            5.0 <span className="text-blue-500 font-semibold">(6)</span> {product.sold}
+          </span>
+        </div>
+      </section>
+
+      {/* Shipping */}
+      <section className="py-2">
+        <div className="px-4 py-2 flex flex-col gap-1">
+          <div className="flex items-center gap-1.5">
+            <Truck className="w-4 h-4 text-cyan-600" />
+            <span className="bg-cyan-50 text-cyan-600 text-[11px] font-semibold px-1.5 rounded">frete grátis</span>
+            <span className="text-xs">Receba até 01/06</span>
+          </div>
+          <span className="text-[11px] text-gray-400 line-through ml-6">Taxa de envio: R$ 20,90</span>
+        </div>
+        <div className="h-px bg-gray-100 mx-4" />
+        <div className="px-4 py-2 flex items-center gap-2">
+          <Shield className="w-4 h-4 text-gray-600" />
+          <span className="text-xs">Devoluções gratuitas em 30 dias • Cancelamento fácil</span>
+        </div>
+
+        {/* Variações */}
+        <div className="px-4 py-3 flex items-center gap-3 border-t border-gray-100">
+          <img src={product.img} alt="" className="w-10 h-10 object-cover rounded-lg bg-gray-50" />
+          <span className="text-gray-500 text-sm flex-1">1 opções disponíveis</span>
+          <ChevronRight className="w-5 h-5 text-gray-400" />
+        </div>
+      </section>
+
+      {/* Proteção do cliente */}
+      <section className="bg-amber-50/60 mx-3 rounded-lg p-3">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-1.5 text-amber-700 text-xs font-semibold">
+            <Shield className="w-4 h-4" /> Proteção do cliente
+          </div>
+          <ChevronRight className="w-3.5 h-3.5 text-amber-700" />
+        </div>
+        <ul className="grid grid-cols-2 gap-y-1 text-[11px] text-gray-800">
+          {["Devolução gratuita", "Reembolso automático por danos", "Pagamento seguro", "Cupom por atraso na coleta"].map((t) => (
+            <li key={t} className="flex items-center gap-1">
+              <Check className="w-3 h-3 text-amber-600" /> {t}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Vídeos dos criadores */}
+      <section className="px-4 pt-4">
+        <div className="flex items-center gap-2 mb-1">
+          <Video className="w-4 h-4" />
+          <span className="font-semibold text-sm">Vídeos dos criadores</span>
+        </div>
+        <p className="text-[11px] text-gray-500 mb-2">Conteúdo enviado por quem testou</p>
+        <div className="grid grid-cols-3 gap-2">
+          {creators.map((c) => (
+            <div key={c.name} className="aspect-[3/4] rounded-lg bg-gray-100 relative overflow-hidden">
+              <img src={c.img} alt={c.name} className="w-full h-full object-cover opacity-90" />
+              <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-center gap-1.5">
+                <img src={c.img} alt="" className="w-5 h-5 rounded-full border border-white object-cover" />
+                <span className="text-white text-[10px] font-semibold truncate drop-shadow">{c.name}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Avaliações */}
+      <section className="px-4 pt-5">
+        <div className="text-xs text-gray-600 font-semibold mb-1">Avaliações dos clientes (207)</div>
+        <div className="flex items-center gap-1 mb-3">
+          <span className="text-lg font-bold">4.7</span>
+          <span className="text-xs text-gray-400">/5</span>
+          <span className="flex">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star key={i} className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+            ))}
+          </span>
+        </div>
+
+        <div className="border-t border-gray-100 pt-3">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-8 h-8 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center text-xs font-bold">G</div>
+            <div className="flex flex-col">
+              <span className="text-xs font-semibold">Gabriel Ferreira</span>
+              <span className="text-[10px] text-teal-500">2026-05-17 23:32:27</span>
+            </div>
+          </div>
+          <div className="flex mb-1">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+            ))}
+          </div>
+          <p className="text-xs leading-relaxed">
+            Gostei demais da compra, qualidade excelente e quantidade certinha. Pra quem curte coleção vale muito a pena 🔥
+          </p>
+          <div className="grid grid-cols-3 gap-1.5 mt-2">
+            {reviewPhotos.map((src, i) => (
+              <img key={i} src={src} alt={`Foto ${i + 1}`} className="aspect-square w-full object-cover rounded-md" />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Mais desta loja */}
+      <section className="px-4 pt-6">
+        <h2 className="font-semibold text-sm mb-2">Mais desta loja</h2>
+        <div className="grid grid-cols-2 gap-3">
+          {products.filter((p) => p.id !== product.id).slice(0, 4).map((p) => (
+            <Link to="/produto/$id" params={{ id: p.id }} key={p.id} className="block">
+              <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden">
+                <img src={p.img} alt={p.name} className="w-full h-full object-contain" />
+              </div>
+              <div className="mt-1.5">
+                <div className="text-rose-500 font-bold text-sm">{p.price}</div>
+                <div className="text-[11px] text-gray-400 line-through">{p.old}</div>
+                <div className="text-[11px] text-gray-700 truncate">{p.name}</div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Sticky bottom CTA */}
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[500px] bg-white border-t border-gray-200 px-3 py-2 flex items-center gap-2 z-40">
+        <button className="flex flex-col items-center justify-center text-[10px] text-gray-600 w-12">
+          <img src={carrinho2} alt="" width={22} height={22} />
+        </button>
+        <button className="flex-1 h-11 rounded-l-full bg-amber-400 text-white text-sm font-bold flex items-center justify-center gap-1">
+          <img src={bilhete2} alt="" width={16} height={16} style={{ filter: "brightness(0) invert(1)" }} />
+          Adicionar ao carrinho
+        </button>
+        <button className="flex-1 h-11 rounded-r-full bg-rose-500 text-white text-sm font-bold">
+          Comprar agora
+        </button>
+      </div>
+    </div>
+  );
+}
