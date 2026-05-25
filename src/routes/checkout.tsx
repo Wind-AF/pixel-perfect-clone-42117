@@ -842,11 +842,14 @@ function Step4({ customer, totalFinal }: { customer: Customer; totalFinal: numbe
           </label>
         </div>
 
+        {error && <div className="text-sm text-rose-600 text-center">{error}</div>}
+
         <button
           onClick={finalize}
-          className="w-full h-12 rounded-lg bg-rose-500 hover:bg-rose-600 text-white font-bold text-base tracking-wide"
+          disabled={loading || items.length === 0}
+          className="w-full h-12 rounded-lg bg-rose-500 hover:bg-rose-600 disabled:opacity-60 text-white font-bold text-base tracking-wide"
         >
-          FINALIZAR COMPRA
+          {loading ? "Gerando PIX..." : "FINALIZAR COMPRA"}
         </button>
       </div>
 
