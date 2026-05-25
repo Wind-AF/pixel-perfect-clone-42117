@@ -1,6 +1,15 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Shield, Truck, Check, Star, Video } from "lucide-react";
+import { ChevronRight, Truck, Star, Video } from "lucide-react";
+import iconBack from "@/assets/icon-back.png";
+import iconSave from "@/assets/icon-save.png";
+import iconRaio from "@/assets/icon-raio.png";
+import iconCheck from "@/assets/icon-check.png";
+import iconWhats from "@/assets/icon-whatsapp.png";
+import iconTelegram from "@/assets/icon-telegram.png";
+import iconLink from "@/assets/icon-link.png";
+import creatorNandy from "@/assets/creator-nandy.jpg";
+import creatorMateus from "@/assets/creator-mateus.jpg";
 import { getProduct, products } from "@/data/products";
 import carrinho from "@/assets/carrinho.png";
 import carrinho2 from "@/assets/carrinho-2.png";
@@ -65,7 +74,9 @@ export const Route = createFileRoute("/produto/$id")({
 
 const creators = [
   { name: "Carla Maria", img: creatorCarla },
+  { name: "Nandy zorzan", img: creatorNandy },
   { name: "Califórnices", img: creatorCalifornices },
+  { name: "Matheus Alberto", img: creatorMateus },
   { name: "Andre Arthur", img: creatorAndre },
 ];
 
