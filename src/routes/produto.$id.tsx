@@ -70,6 +70,16 @@ import reviewFoto38 from "@/assets/review-foto-38.jpg";
 import reviewFoto39 from "@/assets/review-foto-39.jpg";
 import reviewFoto40 from "@/assets/review-foto-40.jpg";
 import reviewFoto41 from "@/assets/review-foto-41.jpg";
+import reviewFoto46 from "@/assets/review-foto-46.jpg";
+import reviewFoto47 from "@/assets/review-foto-47.jpg";
+import reviewFoto48 from "@/assets/review-foto-48.jpg";
+import reviewFoto49 from "@/assets/review-foto-49.jpg";
+import reviewFoto50 from "@/assets/review-foto-50.jpg";
+import reviewFoto51 from "@/assets/review-foto-51.jpg";
+import reviewFoto52 from "@/assets/review-foto-52.jpg";
+import reviewFoto53 from "@/assets/review-foto-53.jpg";
+import reviewFoto54 from "@/assets/review-foto-54.jpg";
+import reviewFoto55 from "@/assets/review-foto-55.jpg";
 import reviewFoto42 from "@/assets/review-foto-42.jpg";
 import reviewFoto43 from "@/assets/review-foto-43.jpg";
 import reviewFoto44 from "@/assets/review-foto-44.jpg";
@@ -103,7 +113,7 @@ const creators = [
   { name: "Diego Ramos", img: creatorMateus, video: "/videos/shop-8.mp4" },
 ];
 
-const reviewPhotos = [reviewFoto1, reviewFoto2, reviewFoto3, reviewFoto4, reviewFoto5, reviewFoto6, reviewFoto7, reviewFoto8, reviewFoto9, reviewFoto10, reviewFoto11, reviewFoto12, reviewFoto13, reviewFoto14, reviewFoto15, reviewFoto16, reviewFoto17, reviewFoto18, reviewFoto19, reviewFoto20, reviewFoto21, reviewFoto22, reviewFoto23, reviewFoto24, reviewFoto25, reviewFoto26, reviewFoto27, reviewFoto28, reviewFoto29, reviewFoto30, reviewFoto31, reviewFoto32, reviewFoto33, reviewFoto34, reviewFoto35, reviewFoto36, reviewFoto37, reviewFoto38, reviewFoto39, reviewFoto40, reviewFoto41];
+const reviewPhotos = [reviewFoto1, reviewFoto2, reviewFoto3, reviewFoto4, reviewFoto5, reviewFoto6, reviewFoto7, reviewFoto8, reviewFoto9, reviewFoto10, reviewFoto11, reviewFoto12, reviewFoto13, reviewFoto14, reviewFoto15, reviewFoto16, reviewFoto17, reviewFoto18, reviewFoto19, reviewFoto20, reviewFoto21, reviewFoto22, reviewFoto23, reviewFoto24, reviewFoto25, reviewFoto26, reviewFoto27, reviewFoto28, reviewFoto29, reviewFoto30, reviewFoto31, reviewFoto32, reviewFoto33, reviewFoto34, reviewFoto35, reviewFoto36, reviewFoto37, reviewFoto38, reviewFoto39, reviewFoto40, reviewFoto41, reviewFoto46, reviewFoto47, reviewFoto48, reviewFoto49, reviewFoto50, reviewFoto51, reviewFoto52, reviewFoto53, reviewFoto54, reviewFoto55];
 
 function ProdutoPage() {
   const [shareOpen, setShareOpen] = useState(false);
