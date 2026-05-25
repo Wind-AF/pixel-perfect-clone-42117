@@ -21,7 +21,7 @@ const fmt = (n: number) =>
 const parsePrice = (p: string) =>
   Number(p.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".")) || 0;
 
-type ShippingOption = { id: string; name: string; days: string; price: number };
+type ShippingOption = { id: string; name: string; days: string; price: number; oldPrice?: number };
 
 function useCountdown(seconds: number) {
   const [s, setS] = useState(seconds);
