@@ -20,6 +20,8 @@ import reviewerJoyce from "@/assets/reviewer-joyce.jpg";
 import reviewerJuan from "@/assets/reviewer-juan.jpg";
 import reviewerJuliaRafael from "@/assets/reviewer-juliaerafael.jpg";
 import { getProduct, products } from "@/data/products";
+import { useCart } from "@/hooks/use-cart";
+import { BuyDrawer } from "@/components/BuyDrawer";
 import carrinho from "@/assets/carrinho.png";
 import carrinho2 from "@/assets/carrinho-2.png";
 import compartilhar from "@/assets/compartilhar.png";
@@ -127,6 +129,8 @@ function ProdutoPage() {
   const product = getProduct(id);
   const [imgIdx, setImgIdx] = useState(0);
   const [saved, setSaved] = useState(false);
+  const [buyOpen, setBuyOpen] = useState(false);
+  const { count: cartCount } = useCart();
 
   if (!product) {
     return (
@@ -155,7 +159,7 @@ function ProdutoPage() {
             </button>
             <button aria-label="Carrinho" className="relative">
               <img src={carrinho} alt="" width={20} height={20} />
-              <span className="absolute -top-2 -right-3 flex w-4 h-4 bg-rose-500 text-white items-center justify-center rounded-full text-[9px] font-bold">0</span>
+              <span className="absolute -top-2 -right-3 flex w-4 h-4 bg-rose-500 text-white items-center justify-center rounded-full text-[9px] font-bold">{cartCount}</span>
             </button>
             <button aria-label="Mais" className="text-gray-700"><img src={iconDots} alt="" width={18} height={18} /></button>
           </div>
@@ -446,10 +450,10 @@ function ProdutoPage() {
           <MessageCircle className="w-5 h-5" strokeWidth={1.8} />
           <span className="mt-0.5">Chat</span>
         </button>
-        <button className="flex-1 h-11 rounded-full bg-gray-100 text-gray-800 text-sm font-bold flex items-center justify-center px-2 text-center leading-tight">
+        <button onClick={() => setBuyOpen(true)} className="flex-1 h-11 rounded-full bg-gray-100 text-gray-800 text-sm font-bold flex items-center justify-center px-2 text-center leading-tight">
           Adicionar ao Carrinho
         </button>
-        <button className="flex-1 h-11 rounded-full bg-rose-500 text-white text-sm font-bold">
+        <button onClick={() => setBuyOpen(true)} className="flex-1 h-11 rounded-full bg-rose-500 text-white text-sm font-bold">
           Comprar Agora
         </button>
       </div>
@@ -482,6 +486,8 @@ function ProdutoPage() {
           </div>
         </div>
       )}
+
+      <BuyDrawer product={product} open={buyOpen} onClose={() => setBuyOpen(false)} />
     </div>
   );
 }
