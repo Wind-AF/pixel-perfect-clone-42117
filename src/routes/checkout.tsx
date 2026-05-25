@@ -269,24 +269,64 @@ function CheckoutPage() {
   );
 }
 
-/* ---------- Step 1: Unified products list ---------- */
+/* ---------- Step Indicator ---------- */
+
+function StepIndicator({ current }: { current: 2 | 3 | 4 }) {
+  const steps = [
+    { n: 1, label: "Identificação" },
+    { n: 2, label: "Ofertas" },
+    { n: 3, label: "Pagamento" },
+  ];
+  const activeIdx = current === 2 ? 1 : current === 3 ? 2 : 3;
+  return (
+    <div className="flex items-center justify-between">
+      {steps.map((s, i) => {
+        const done = s.n < activeIdx;
+        const active = s.n === activeIdx;
+        return (
+          <div key={s.n} className="flex items-center flex-1 last:flex-none">
+            <div className="flex flex-col items-center gap-1">
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                  done
+                    ? "bg-emerald-500 text-white"
+                    : active
+                      ? "bg-gray-900 text-white"
+                      : "bg-gray-200 text-gray-500"
+                }`}
+              >
+                {done ? <Check className="w-4 h-4" /> : s.n}
+              </div>
+              <span
+                className={`text-[11px] font-semibold ${active || done ? "text-gray-900" : "text-gray-400"}`}
+              >
+                {s.label}
+              </span>
+            </div>
+            {i < steps.length - 1 && (
+              <div
+                className={`flex-1 h-px mx-2 -mt-4 ${done ? "bg-emerald-500" : "bg-gray-200"}`}
+              />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ---------- Step 1: Cart summary ---------- */
 
 function Step1({
   cartItems,
-  bumpsToShow,
   updateQty,
-  onBumpClick,
-  getBumpCount,
 }: {
   cartItems: CartItem[];
-  bumpsToShow: Bump[];
   updateQty: (id: string, q: number) => void;
-  onBumpClick: (b: Bump) => void;
-  getBumpCount: (b: Bump) => number;
 }) {
   return (
     <div className="space-y-3 pt-1">
-      {cartItems.length === 0 && bumpsToShow.length === BUMPS.length && (
+      {cartItems.length === 0 && (
         <div className="bg-white rounded-xl border border-gray-100 p-6 text-center text-sm text-gray-500">
           Carrinho vazio.{" "}
           <Link to="/" className="text-rose-600 font-semibold">
@@ -326,13 +366,41 @@ function Step1({
           </section>
         );
       })}
+    </div>
+  );
+}
+
+/* ---------- Step 3: Order bumps (penultimate) ---------- */
+
+function Step3({
+  bumpsToShow,
+  onBumpClick,
+  getBumpCount,
+  onContinue,
+  totalFinal,
+  descontos,
+  itemsCount,
+}: {
+  bumpsToShow: Bump[];
+  onBumpClick: (b: Bump) => void;
+  getBumpCount: (b: Bump) => number;
+  onContinue: () => void;
+  totalFinal: number;
+  descontos: number;
+  itemsCount: number;
+}) {
+  return (
+    <div className="space-y-3 pt-1 pb-32">
+      <h2 className="text-center font-bold text-gray-900 text-base pt-2">
+        Acho que você vai gostar destas ofertas ;)
+      </h2>
 
       {bumpsToShow.map((b) => {
         const count = getBumpCount(b);
         const off = Math.max(0, b.old - b.price);
         return (
           <div key={b.id} className="space-y-2">
-            <section className="bg-white shadow-sm border border-slate-200 rounded-xl px-4 py-4">
+            <section className="bg-white shadow-sm border border-dashed border-slate-300 rounded-xl px-4 py-4">
               <div className="flex gap-3">
                 <div className="w-[90px] h-[90px] flex-shrink-0 rounded-lg border border-gray-200 bg-white flex items-center justify-center overflow-hidden">
                   <img src={b.img} alt={b.name} className="w-full h-full object-contain p-1" />
@@ -367,6 +435,38 @@ function Step1({
           </div>
         );
       })}
+
+      {bumpsToShow.length === 0 && (
+        <div className="bg-white rounded-xl border border-gray-100 p-6 text-center text-sm text-gray-500">
+          Você já adicionou todas as ofertas disponíveis.
+        </div>
+      )}
+
+      <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-40">
+        {descontos > 0 && (
+          <div className="bg-rose-50 text-rose-600 text-[13px] text-center py-2 px-3 flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5">
+            <Gift className="w-4 h-4 shrink-0" />
+            <span>
+              Você está economizando <strong>R$ {fmt(descontos)}</strong> neste pedido.
+            </span>
+          </div>
+        )}
+        <div className="max-w-3xl mx-auto px-4 py-2.5 flex items-center justify-between">
+          <span className="text-sm text-gray-500">
+            Total ({itemsCount} {itemsCount === 1 ? "item" : "itens"})
+          </span>
+          <span className="text-lg font-bold text-gray-900">R$ {fmt(totalFinal)}</span>
+        </div>
+        <button
+          onClick={onContinue}
+          className="block w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3.5 text-sm uppercase tracking-wide"
+        >
+          Ir para pagamento
+        </button>
+      </footer>
+    </div>
+  );
+}
 
       {cartItems.length > 0 && (
         <div className="bg-white shadow-sm border border-slate-200 rounded-xl px-4 py-4">
