@@ -373,21 +373,54 @@ function ProdutoPage() {
         </div>
         <button className="px-4 py-1.5 bg-gray-100 text-gray-800 text-xs font-semibold rounded-full">Seguir</button>
       </section>
-      </section>
 
       {/* Mais desta loja */}
-      <section className="px-4 pt-6">
-        <h2 className="font-semibold text-sm mb-2">Mais desta loja</h2>
-        <div className="grid grid-cols-2 gap-3">
-          {products.filter((p) => p.id !== product.id).slice(0, 4).map((p) => (
-            <Link to="/produto/$id" params={{ id: p.id }} key={p.id} className="block">
-              <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden">
+      <section className="px-4 pt-5">
+        <h2 className="font-semibold text-sm mb-3">Mais desta loja</h2>
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-2">
+          {products.filter((p) => p.id !== product.id).slice(0, 6).map((p) => (
+            <Link to="/produto/$id" params={{ id: p.id }} key={p.id} className="block shrink-0 w-32">
+              <div className="aspect-square bg-white rounded-lg overflow-hidden flex items-center justify-center">
                 <img src={p.img} alt={p.name} className="w-full h-full object-contain" />
               </div>
               <div className="mt-1.5">
-                <div className="text-rose-500 font-bold text-sm">{p.price}</div>
+                <div className="font-bold text-sm">{p.price}</div>
+                <span className="inline-block mt-1 text-[10px] font-bold text-rose-500 bg-rose-50 px-1.5 py-0.5 rounded">-60%</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Descrição */}
+      <section className="px-4 pt-5">
+        <p className="text-sm leading-relaxed text-gray-800">
+          As emoções do maior espetáculo esportivo do mundo eternizadas no maior álbum de figurinhas de todos os tempos! Uma coleção completa, com todas as seleções classificadas, cromos especiais e todos os detalhes para você acompanhar de pertinho a disputa pela taça da album 2026!
+        </p>
+      </section>
+
+      {/* Você também pode gostar */}
+      <section className="px-4 pt-6 bg-gray-50 mt-4 pb-4">
+        <h2 className="font-semibold text-sm mb-3 pt-4">Você também pode gostar</h2>
+        <div className="grid grid-cols-2 gap-3">
+          {products.filter((p) => p.id !== product.id).map((p) => (
+            <Link to="/produto/$id" params={{ id: p.id }} key={p.id} className="block bg-white rounded-xl overflow-hidden border border-gray-100">
+              <div className="aspect-square bg-white flex items-center justify-center p-3">
+                <img src={p.img} alt={p.name} className="w-full h-full object-contain" />
+              </div>
+              <div className="px-2.5 pb-2.5">
+                <div className="text-[12px] font-bold leading-tight line-clamp-2 min-h-[2.5em]">{p.name}</div>
+                <div className="mt-1.5 inline-flex items-center gap-1 bg-rose-50 text-rose-500 text-[10px] font-bold px-1.5 py-0.5 rounded">
+                  <img src={bilhete} alt="" width={10} height={10} style={{ filter: "brightness(0) saturate(100%) invert(28%) sepia(94%) saturate(2913%) hue-rotate(330deg) brightness(95%) contrast(101%)" }} />
+                  60% OFF
+                </div>
+                <div className="mt-1 inline-block ml-1 bg-emerald-50 text-emerald-600 text-[10px] font-semibold px-1.5 py-0.5 rounded">Frete grátis</div>
+                <div className="flex items-center gap-1 mt-1.5 text-[11px] text-gray-600">
+                  <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" /> 4.7 | 4312 vendido(s)
+                </div>
+                <div className="mt-1.5 text-rose-500 font-bold text-base">{p.price}</div>
                 <div className="text-[11px] text-gray-400 line-through">{p.old}</div>
-                <div className="text-[11px] text-gray-700 truncate">{p.name}</div>
+                <button className="mt-2 w-full h-8 rounded-full bg-gradient-to-r from-rose-100 to-rose-500 text-white text-xs font-bold flex items-center justify-end pr-4">Comprar</button>
               </div>
             </Link>
           ))}
