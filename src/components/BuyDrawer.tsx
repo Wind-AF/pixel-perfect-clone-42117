@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { X, Maximize2 } from "lucide-react";
+import { X, Maximize2, Check } from "lucide-react";
+import { toast } from "sonner";
 import { useCart } from "@/hooks/use-cart";
 import type { Product } from "@/data/products";
 
@@ -19,6 +20,10 @@ export function BuyDrawer({
 
   const handleBuy = () => {
     addItem({ id: product.id, name: product.name, img: product.img, price: product.price }, qty);
+    toast.success("Adicionado ao carrinho", {
+      icon: <Check className="w-4 h-4 text-emerald-500" />,
+      duration: 1800,
+    });
     setQty(1);
     onClose();
   };
@@ -34,7 +39,7 @@ export function BuyDrawer({
       >
         {/* top: image + price */}
         <div className="p-4 flex items-start gap-3 relative">
-          <div className="w-24 h-24 rounded-lg border border-gray-200 bg-white flex items-center justify-center shrink-0 -mt-10 shadow-sm">
+          <div className="w-24 h-24 rounded-lg border border-gray-200 bg-white flex items-center justify-center shrink-0 shadow-sm">
             <img src={product.img} alt={product.name} className="w-full h-full object-contain p-1" />
           </div>
           <div className="flex-1 min-w-0">
