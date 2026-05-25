@@ -315,6 +315,14 @@ function ProdutoPage() {
         </div>
       </section>
 
+      {/* Footer Políticas */}
+      <footer className="mt-5 px-4 py-4 border-t border-gray-200 bg-white text-center text-[12px] text-gray-500 leading-relaxed">
+        <strong className="block text-gray-800 text-[12px] mb-1.5">Políticas e Privacidade</strong>
+        <a href="#" className="text-blue-600 underline font-semibold">Política de Privacidade</a>
+        <span className="block mt-1.5">Seus dados são tratados conforme a legislação vigente e usados apenas para processar pedidos e atendimento.</span>
+      </footer>
+
+
       {/* Sticky bottom CTA */}
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[500px] bg-white border-t border-gray-200 px-3 py-2 flex items-center gap-2 z-40">
         <button className="flex flex-col items-center justify-center text-[10px] text-gray-600 w-12">
@@ -328,6 +336,33 @@ function ProdutoPage() {
           Comprar agora
         </button>
       </div>
+
+      {/* Share drawer */}
+      {shareOpen && (
+        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50" onClick={() => setShareOpen(false)}>
+          <div className="w-full max-w-[500px] bg-white rounded-t-2xl p-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-semibold text-sm">Compartilhar</span>
+              <button onClick={() => setShareOpen(false)} className="text-gray-500 text-xl leading-none">×</button>
+            </div>
+            <div className="flex gap-5 overflow-x-auto pb-2">
+              {[
+                { img: iconLink, label: "Copiar Link", onClick: copyLink },
+                { img: iconWhats, label: "WhatsApp", onClick: copyLink },
+                { img: iconTelegram, label: "Telegram", onClick: copyLink },
+              ].map((s) => (
+                <button key={s.label} onClick={s.onClick} className="flex flex-col items-center gap-1 min-w-[64px]">
+                  <span className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center bg-gray-50">
+                    <img src={s.img} alt="" className="w-9 h-9 object-contain" />
+                  </span>
+                  <span className="text-[11px] text-gray-700">{s.label}</span>
+                </button>
+              ))}
+            </div>
+            <button onClick={() => setShareOpen(false)} className="mt-3 w-full h-10 rounded-full bg-gray-100 text-gray-700 text-sm font-semibold">Cancelar</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
