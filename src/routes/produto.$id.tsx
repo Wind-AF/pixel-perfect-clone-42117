@@ -284,14 +284,14 @@ function ProdutoPage() {
             <div key={c.name} className="shrink-0 w-32 aspect-[3/4] rounded-lg bg-gray-100 relative overflow-hidden snap-start">
               <video
                 src={c.video}
-                poster={c.img}
                 muted
                 loop
                 playsInline
                 autoPlay
-                preload="metadata"
+                preload="auto"
                 className="w-full h-full object-cover"
               />
+
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
               <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-center gap-1.5">
                 <img src={c.img} alt="" className="w-5 h-5 rounded-full border border-white object-cover" />
