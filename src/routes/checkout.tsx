@@ -652,7 +652,7 @@ function Step2({ initial, onNext }: { initial: Customer; onNext: (c: Customer) =
           type="submit"
           className="w-full h-12 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-base uppercase tracking-wide"
         >
-          Gerar PIX
+          Continuar
         </button>
       </form>
     </div>
