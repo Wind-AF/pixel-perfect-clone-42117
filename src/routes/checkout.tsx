@@ -490,8 +490,12 @@ function Step3({
       <Stepper active={2} />
       <form onSubmit={submit} className="px-4 pb-5 space-y-4">
         <Field label="CEP">
-          <input inputMode="numeric" placeholder="00000-000" value={form.cep} onChange={(e) => setForm({ ...form, cep: maskCep(e.target.value) })} className={inputCls} />
+          <div className="relative">
+            <input inputMode="numeric" placeholder="00000-000" value={form.cep} onChange={(e) => handleCepChange(e.target.value)} className={inputCls} />
+            {cepLoading && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">buscando…</span>}
+          </div>
         </Field>
+
         <Field label="Endereço">
           <input placeholder="Rua / Avenida" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} maxLength={200} className={inputCls} />
         </Field>
