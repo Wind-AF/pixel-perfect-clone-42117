@@ -39,7 +39,7 @@ export function BuyDrawer({
       >
         {/* top: image + price */}
         <div className="p-4 flex items-start gap-3 relative">
-          <div className="w-24 h-24 rounded-lg border border-gray-200 bg-white flex items-center justify-center shrink-0 -mt-10 shadow-sm">
+          <div className="w-24 h-24 rounded-lg border border-gray-200 bg-white flex items-center justify-center shrink-0 shadow-sm">
             <img src={product.img} alt={product.name} className="w-full h-full object-contain p-1" />
           </div>
           <div className="flex-1 min-w-0">
