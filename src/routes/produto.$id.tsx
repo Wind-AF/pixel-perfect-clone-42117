@@ -224,7 +224,7 @@ function ProdutoPage() {
 
         {/* Variações */}
         <div className="px-4 py-3 flex items-center gap-3 border-t border-gray-100">
-          <img src={product.img} alt="" className="w-10 h-10 object-cover rounded-lg bg-gray-50" />
+          <img src={iconGrid} alt="" className="w-10 h-10 object-contain p-2 rounded-lg bg-gray-50" />
           <span className="text-gray-500 text-sm flex-1">1 opções disponíveis</span>
           <ChevronRight className="w-5 h-5 text-gray-400" />
         </div>
