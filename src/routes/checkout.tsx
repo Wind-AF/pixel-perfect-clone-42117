@@ -139,12 +139,12 @@ function CheckoutPage() {
     else setStep(1);
   };
 
-  const addBump = (b: Bump, variant?: string) => {
-    const suffix = variant ? `-${variant}` : "";
+  const addBump = (b: Bump, variant: string) => {
+    const suffix = `-${variant}`;
     addItem(
       {
         id: `${b.id}${suffix}`,
-        name: variant ? `${b.name} — ${variant}` : b.name,
+        name: `${b.name} — ${variant}`,
         img: b.img,
         price: `R$ ${fmt(b.price)}`,
       },
@@ -153,11 +153,7 @@ function CheckoutPage() {
   };
 
   const handleBumpClick = (b: Bump) => {
-    if (b.variants && b.variants.length > 0) {
-      setVariantModal(b);
-    } else {
-      addBump(b);
-    }
+    setVariantModal(b);
   };
 
   // Build interleaved list: cart items first, then bumps not yet in cart
