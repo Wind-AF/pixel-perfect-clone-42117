@@ -22,6 +22,16 @@ import reviewFoto8 from "@/assets/review-foto-8.jpg";
 import reviewFoto9 from "@/assets/review-foto-9.jpg";
 import reviewFoto10 from "@/assets/review-foto-10.jpg";
 import reviewFoto11 from "@/assets/review-foto-11.jpg";
+import reviewFoto12 from "@/assets/review-foto-12.jpg";
+import reviewFoto13 from "@/assets/review-foto-13.jpg";
+import reviewFoto14 from "@/assets/review-foto-14.jpg";
+import reviewFoto15 from "@/assets/review-foto-15.jpg";
+import reviewFoto16 from "@/assets/review-foto-16.jpg";
+import reviewFoto17 from "@/assets/review-foto-17.jpg";
+import reviewFoto18 from "@/assets/review-foto-18.jpg";
+import reviewFoto19 from "@/assets/review-foto-19.jpg";
+import reviewFoto20 from "@/assets/review-foto-20.jpg";
+import reviewFoto21 from "@/assets/review-foto-21.jpg";
 
 export const Route = createFileRoute("/produto/$id")({
   component: ProdutoPage,
@@ -39,7 +49,7 @@ const creators = [
   { name: "Andre Arthur", img: creatorAndre },
 ];
 
-const reviewPhotos = [reviewFoto1, reviewFoto2, reviewFoto3, reviewFoto4, reviewFoto5, reviewFoto6, reviewFoto7, reviewFoto8, reviewFoto9, reviewFoto10, reviewFoto11];
+const reviewPhotos = [reviewFoto1, reviewFoto2, reviewFoto3, reviewFoto4, reviewFoto5, reviewFoto6, reviewFoto7, reviewFoto8, reviewFoto9, reviewFoto10, reviewFoto11, reviewFoto12, reviewFoto13, reviewFoto14, reviewFoto15, reviewFoto16, reviewFoto17, reviewFoto18, reviewFoto19, reviewFoto20, reviewFoto21];
 
 function ProdutoPage() {
   const { id } = Route.useParams();
