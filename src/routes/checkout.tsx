@@ -829,6 +829,14 @@ function StepEntrega({
               );
             })}
           </div>
+          {(() => {
+            const sel = CARRIERS.find((c) => c.id === form.carrier) ?? CARRIERS[0];
+            return (
+              <div className="text-xs text-gray-500 mt-2">
+                Frete selecionado: <span className="font-semibold text-gray-700">{sel.name} (R$ {fmt(sel.price)})</span>
+              </div>
+            );
+          })()}
         </div>
 
         {error && <div className="text-sm text-rose-600 text-center">{error}</div>}
