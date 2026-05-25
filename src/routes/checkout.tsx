@@ -120,7 +120,7 @@ function CheckoutPage() {
             freeShipping={freeShipping}
           />
         )}
-        {step === 2 && <Step2 onNext={() => setStep(3)} />}
+        {step === 2 && <Step2 initial={customer} onNext={(c) => { setCustomer(c); setStep(3); }} />}
         {step === 3 && (
           <Step3
             options={shippingOptions}
@@ -130,7 +130,7 @@ function CheckoutPage() {
             onNext={() => setStep(4)}
           />
         )}
-        {step === 4 && <Step4 />}
+        {step === 4 && <Step4 customer={customer} totalFinal={totalFinal} />}
       </main>
 
       {/* Footer */}
