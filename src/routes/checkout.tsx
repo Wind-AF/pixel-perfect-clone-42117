@@ -55,7 +55,7 @@ function useRotatingSubtitle() {
   );
 }
 
-type Step = 1 | 2 | 4;
+type Step = 1 | 2 | 3 | 4;
 export type Customer = { email: string; phone: string; name: string; cpf: string };
 
 type Bump = {
@@ -65,7 +65,8 @@ type Bump = {
   price: number;
   old: number;
   note?: string;
-  variants?: string[];
+  variantLabel: string;
+  variants: string[];
 };
 
 const BUMPS: Bump[] = [
@@ -75,6 +76,8 @@ const BUMPS: Bump[] = [
     img: bumpLegend,
     price: 12.7,
     old: 39.58,
+    variantLabel: "Tamanho",
+    variants: ["Único"],
   },
   {
     id: "bump-caixinha",
@@ -82,6 +85,7 @@ const BUMPS: Bump[] = [
     img: bumpCaixinha,
     price: 8.98,
     old: 37.58,
+    variantLabel: "Cor",
     variants: ["Preto", "Dourado"],
   },
   {
@@ -90,6 +94,8 @@ const BUMPS: Bump[] = [
     img: bumpAdesivo,
     price: 19.99,
     old: 59.99,
+    variantLabel: "Tamanho",
+    variants: ["Único"],
   },
   {
     id: "bump-neymar-lote",
@@ -98,6 +104,8 @@ const BUMPS: Bump[] = [
     price: 4.9,
     old: 31.9,
     note: "Após adicionar 1x: 12% de sorte",
+    variantLabel: "Cor",
+    variants: ["Único"],
   },
   {
     id: "bump-coca",
@@ -105,6 +113,8 @@ const BUMPS: Bump[] = [
     img: bumpCoca,
     price: 29.9,
     old: 79.9,
+    variantLabel: "Tamanho",
+    variants: ["Único"],
   },
 ];
 
