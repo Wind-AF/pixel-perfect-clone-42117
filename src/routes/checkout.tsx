@@ -536,3 +536,214 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 const inputCls =
   "w-full h-12 rounded-lg border border-gray-300 px-3 text-sm focus:outline-none focus:border-gray-900";
+
+/* ---------- Step 4: Pagamento + Order Bumps ---------- */
+
+type Bump = {
+  id: string;
+  name: string;
+  img: string;
+  price: number;
+  old: number;
+  off: number;
+  note?: string;
+  variants: string[];
+};
+
+const BUMPS: Bump[] = [
+  {
+    id: "bump-neymar",
+    name: "[Lançamento] Novo Lote Neymar Edition chance de 12%. aumente sua chance ao adicionar mais!",
+    img: bumpNeymar,
+    price: 11.9,
+    old: 31.9,
+    off: 20,
+    note: "Após adicionar 1x: 12% de sorte",
+    variants: ["Padrão"],
+  },
+  {
+    id: "bump-legend",
+    name: "Aumente suas chances para garantir Figurinhas Raras✨",
+    img: bumpLegend,
+    price: 19.7,
+    old: 39.58,
+    off: 19.88,
+    variants: ["Padrão"],
+  },
+  {
+    id: "bump-caixinha",
+    name: "Caixinha Temática Copa do Mundo 2026 - Capacidade até 500 Figurinhas",
+    img: bumpCaixinha,
+    price: 15.98,
+    old: 37.58,
+    off: 21.6,
+    variants: ["Preto", "Dourado"],
+  },
+];
+
+function Step4() {
+  const { addItem, items } = useCart();
+  const [modal, setModal] = useState<Bump | null>(null);
+  const [variant, setVariant] = useState("");
+  const [qtys, setQtys] = useState<Record<string, number>>({});
+  const navigate = useNavigate();
+
+  const getQty = (id: string) => qtys[id] ?? 1;
+  const setQty = (id: string, n: number) => setQtys((q) => ({ ...q, [id]: Math.max(1, n) }));
+
+  const openAdd = (b: Bump) => {
+    setVariant("");
+    setModal(b);
+  };
+
+  const confirmAdd = () => {
+    if (!modal || !variant) return;
+    addItem(
+      {
+        id: `${modal.id}-${variant}`,
+        name: `${modal.name} — ${variant}`,
+        img: modal.img,
+        price: `R$ ${fmt(modal.price)}`,
+      },
+      getQty(modal.id),
+    );
+    setModal(null);
+  };
+
+  const finalize = () => {
+    alert("Compra finalizada! 🎉");
+    navigate({ to: "/" });
+  };
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-100 mt-2">
+      <Stepper active={3} />
+      <div className="px-4 pb-5 space-y-4">
+        <h3 className="text-center font-bold text-gray-900">Acho que você vai gostar destas ofertas ;)</h3>
+
+        {BUMPS.map((b) => {
+          const inCart = items
+            .filter((i) => i.id.startsWith(b.id + "-"))
+            .reduce((s, i) => s + i.qty, 0);
+          return (
+            <div key={b.id} className="space-y-2">
+              <div className="border border-dashed border-gray-300 rounded-xl p-3">
+                <div className="flex gap-3">
+                  <div className="w-[88px] h-[88px] flex-shrink-0 rounded-lg border border-gray-200 bg-white overflow-hidden">
+                    <img src={b.img} alt={b.name} className="w-full h-full object-contain" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-[15px] text-gray-900 leading-tight">{b.name}</h4>
+                    <div className="mt-1 flex items-baseline gap-2">
+                      <span className="text-gray-400 line-through text-sm">R$ {fmt(b.old)}</span>
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-emerald-600 font-bold text-lg">R$ {fmt(b.price)}</span>
+                      <span className="text-emerald-600 text-sm font-semibold">(R$ {fmt(b.off)} OFF)</span>
+                    </div>
+                    {b.note && <div className="text-emerald-700 text-sm font-semibold mt-1">{b.note}</div>}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between mt-3">
+                  <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-2 py-1">
+                    <button onClick={() => setQty(b.id, getQty(b.id) - 1)} className="w-7 h-7 text-gray-600">−</button>
+                    <span className="w-6 text-center text-sm font-semibold">{getQty(b.id)}</span>
+                    <button onClick={() => setQty(b.id, getQty(b.id) + 1)} className="w-7 h-7 text-gray-600">+</button>
+                  </div>
+                  <span className="text-sm text-gray-500">
+                    {inCart > 0 ? `${inCart} no carrinho` : "Nenhum no carrinho"}
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => openAdd(b)}
+                className="w-full bg-teal-400 hover:bg-teal-500 text-white font-bold py-3 rounded-lg text-sm"
+              >
+                Adicionar item
+              </button>
+            </div>
+          );
+        })}
+
+        <div className="border border-gray-200 rounded-xl p-4">
+          <h4 className="font-bold text-gray-900 mb-3">Forma de pagamento</h4>
+          <label className="flex items-center gap-3 border border-gray-200 rounded-lg px-3 py-3">
+            <div className="w-9 h-9 rounded-md bg-teal-100 flex items-center justify-center text-teal-500 font-bold">
+              PIX
+            </div>
+            <span className="flex-1 font-semibold text-gray-900">PIX à vista</span>
+            <input type="radio" defaultChecked className="accent-blue-600 w-4 h-4" />
+          </label>
+        </div>
+
+        <button
+          onClick={finalize}
+          className="w-full h-12 rounded-lg bg-rose-500 hover:bg-rose-600 text-white font-bold text-base tracking-wide"
+        >
+          FINALIZAR COMPRA
+        </button>
+      </div>
+
+      {/* Modal de variação */}
+      {modal && (
+        <div
+          className="fixed inset-0 bg-black/40 z-[80] flex items-center justify-center p-4"
+          onClick={() => setModal(null)}
+        >
+          <div
+            className="bg-white rounded-xl w-full max-w-md p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex gap-3 items-start">
+              <div className="w-20 h-20 rounded-lg border border-gray-200 overflow-hidden flex-shrink-0">
+                <img src={modal.img} alt={modal.name} className="w-full h-full object-contain" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-bold text-[15px] text-gray-900 leading-tight">{modal.name}</h4>
+                <div className="mt-1 flex items-baseline gap-2">
+                  <span className="text-emerald-600 font-bold text-lg">R$ {fmt(modal.price)}</span>
+                  <span className="text-gray-400 line-through text-sm">R$ {fmt(modal.old)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <label className="block font-semibold text-gray-900 text-sm mb-2">Cor</label>
+              <div className="relative">
+                <select
+                  value={variant}
+                  onChange={(e) => setVariant(e.target.value)}
+                  className="w-full h-12 rounded-lg border-2 border-blue-500 bg-blue-50/30 px-3 text-sm appearance-none focus:outline-none"
+                >
+                  <option value="">Selecione a cor...</option>
+                  {modal.variants.map((v) => (
+                    <option key={v} value={v}>
+                      {v}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 mt-5">
+              <button
+                onClick={() => setModal(null)}
+                className="px-4 h-11 rounded-lg border border-gray-300 text-gray-700 font-semibold"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmAdd}
+                disabled={!variant}
+                className="px-5 h-11 rounded-lg bg-teal-400 hover:bg-teal-500 text-white font-bold disabled:opacity-60"
+              >
+                Quero esse item
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
