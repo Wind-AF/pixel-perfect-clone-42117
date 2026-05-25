@@ -234,7 +234,7 @@ function ProdutoPage() {
       <section className="bg-amber-50/60 mx-3 rounded-lg p-3">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-1.5 text-amber-700 text-xs font-semibold">
-            <span className="inline-block w-4 h-4 rounded-full bg-gradient-to-br from-amber-300 to-yellow-500" />
+            <img src={iconEscudoFill} alt="" width={14} height={14} style={{ filter: "invert(54%) sepia(89%) saturate(575%) hue-rotate(2deg) brightness(96%) contrast(94%)" }} />
             Proteção do cliente
           </div>
           <ChevronRight className="w-3.5 h-3.5 text-amber-700" />
