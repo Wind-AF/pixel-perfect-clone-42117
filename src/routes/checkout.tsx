@@ -21,7 +21,7 @@ const fmt = (n: number) =>
 const parsePrice = (p: string) =>
   Number(p.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".")) || 0;
 
-type ShippingOption = { id: string; name: string; days: string; price: number };
+type ShippingOption = { id: string; name: string; days: string; price: number; oldPrice?: number };
 
 function useCountdown(seconds: number) {
   const [s, setS] = useState(seconds);
@@ -47,8 +47,8 @@ function CheckoutPage() {
 
   const shippingOptions: ShippingOption[] = useMemo(
     () => [
-      { id: "jadlog", name: "JadLog", days: "Receba em até 2 dias úteis", price: freeShipping ? 0 : 25.5 },
-      { id: "sedex", name: "Sedex-Express", days: "Receba em até 4 dias úteis", price: freeShipping ? 0 : 17.5 },
+      { id: "jadlog", name: "JadLog", days: "Receba em até 2 dias úteis", price: freeShipping ? 0 : 16.23, oldPrice: freeShipping ? undefined : 62.44 },
+      { id: "sedex", name: "Sedex-Express", days: "Receba em até 4 dias úteis", price: 9.34, oldPrice: 32.71 },
       { id: "correio", name: "Correio", days: "Receba em até 7 dias úteis", price: 0 },
     ],
     [freeShipping],
@@ -543,8 +543,13 @@ function Step3({
                   <div className="font-bold text-gray-900 text-sm">{o.name}</div>
                   <div className="text-xs text-gray-500">{o.days}</div>
                 </div>
-                <div className="font-bold text-gray-900 text-sm">
-                  {o.price === 0 ? "Grátis" : `R$ ${fmt(o.price)}`}
+                <div className="text-right">
+                  {o.oldPrice && o.price !== 0 && (
+                    <div className="text-[11px] text-gray-400 line-through leading-none">de R$ {fmt(o.oldPrice)}</div>
+                  )}
+                  <div className={`font-bold text-sm ${o.price === 0 ? "text-emerald-600" : "text-gray-900"}`}>
+                    {o.price === 0 ? "Grátis" : `R$ ${fmt(o.price)}`}
+                  </div>
                 </div>
               </label>
             );
