@@ -323,13 +323,9 @@ function ProdutoPage() {
           { name: "Amanda Oliveira", avatar: reviewerCamila, date: "2026-05-02 21:13:55", text: "Perfeitooo 😍 chegou antes do prazo e os pacotinhos são lindos pessoalmente. Valeu muito a compra!", photos: reviewPhotos.slice(46, 51) },
           { name: "micael alves", avatar: reviewerJose, date: "2026-04-28 16:08:14", text: "Lucas Henrique", photos: [reviewFoto42, reviewFoto43] },
         ].map((r) => (
-          <div key={r.name} className={`pt-3 ${idx === 0 ? "border-t border-gray-100" : "border-t border-gray-100 mt-3"}`}>
+          <div key={r.name} className="pt-3 border-t border-gray-100 mt-3">
             <div className="flex items-center gap-2 mb-1">
-              {r.avatar ? (
-                <img src={r.avatar} alt={r.name} className="w-8 h-8 rounded-full object-cover" />
-              ) : (
-                <div className="w-8 h-8 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center text-xs font-bold">{r.initial}</div>
-              )}
+              <img src={r.avatar} alt={r.name} className="w-8 h-8 rounded-full object-cover" />
               <div className="flex flex-col">
                 <span className="text-xs font-semibold">{r.name}</span>
                 <span className="text-[10px] text-teal-500">{r.date}</span>
@@ -342,7 +338,7 @@ function ProdutoPage() {
             </div>
             <p className="text-xs leading-relaxed">{r.text}</p>
             {r.photos && (
-              <div className="grid grid-cols-3 gap-1.5 mt-2">
+              <div className="grid grid-cols-4 gap-1.5 mt-2">
                 {r.photos.map((src, i) => (
                   <img key={i} src={src} alt={`Foto ${i + 1}`} className="aspect-square w-full object-cover rounded-md" />
                 ))}
@@ -350,6 +346,33 @@ function ProdutoPage() {
             )}
           </div>
         ))}
+
+        {/* Avaliações da loja */}
+        <div className="mt-5 pt-4 border-t border-gray-100">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="font-bold text-sm">Avaliações da loja (13,9 mil)</div>
+              <div className="text-[11px] text-gray-500 mt-0.5">Resumo e classificação dos clientes</div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-gray-400 mt-1" />
+          </div>
+          <div className="flex gap-2 mt-3 overflow-x-auto scrollbar-hide">
+            <span className="px-3 py-1.5 bg-gray-100 rounded-full text-[11px] whitespace-nowrap">Inclui imagens ou vídeos <span className="font-semibold">(2,5 mi)</span></span>
+            <span className="px-3 py-1.5 bg-gray-100 rounded-full text-[11px] whitespace-nowrap flex items-center gap-1"><Star className="w-3 h-3 fill-yellow-400 text-yellow-400" /><span className="font-semibold">5</span> (12,3 mil)</span>
+            <span className="px-3 py-1.5 bg-gray-100 rounded-full text-[11px] whitespace-nowrap flex items-center gap-1"><Star className="w-3 h-3 fill-yellow-400 text-yellow-400" /><span className="font-semibold">4</span> (857)</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Loja */}
+      <section className="px-4 mt-4 py-3 border-y border-gray-100 flex items-center gap-3">
+        <div className="w-11 h-11 rounded-full bg-yellow-300 flex items-center justify-center text-[10px] font-black text-red-600 italic shrink-0">PANINI</div>
+        <div className="flex-1">
+          <div className="font-bold text-sm">Album 2026</div>
+          <div className="text-[11px] text-gray-500">38808 vendido(s)</div>
+        </div>
+        <button className="px-4 py-1.5 bg-gray-100 text-gray-800 text-xs font-semibold rounded-full">Seguir</button>
+      </section>
       </section>
 
       {/* Mais desta loja */}
