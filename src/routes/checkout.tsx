@@ -468,24 +468,7 @@ function Step3({
   );
 }
 
-      {cartItems.length > 0 && (
-        <div className="bg-white shadow-sm border border-slate-200 rounded-xl px-4 py-4">
-          <h4 className="font-bold text-gray-900 mb-3">Forma de pagamento</h4>
-          <label className="flex items-center gap-3 border-2 border-blue-500 rounded-lg px-3 py-3 cursor-pointer">
-            <img src={pixLogo} alt="PIX" className="w-10 h-10 object-contain" />
-            <span className="flex-1 font-semibold text-gray-900">PIX à vista</span>
-            <input
-              type="radio"
-              defaultChecked
-              readOnly
-              className="accent-blue-600 w-4 h-4"
-            />
-          </label>
-        </div>
-      )}
-    </div>
-  );
-}
+
 
 function QtyStepper({
   qty,
