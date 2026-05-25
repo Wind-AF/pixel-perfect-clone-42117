@@ -133,7 +133,7 @@ function ProdutoPage() {
               <img src={carrinho} alt="" width={20} height={20} />
               <span className="absolute -top-2 -right-3 flex w-4 h-4 bg-rose-500 text-white items-center justify-center rounded-full text-[9px] font-bold">0</span>
             </button>
-            <button aria-label="Denunciar" className="text-gray-700 text-xl leading-none">⋯</button>
+            <button aria-label="Mais" className="text-gray-700"><img src={iconDots} alt="" width={18} height={18} /></button>
           </div>
         </div>
       </header>
