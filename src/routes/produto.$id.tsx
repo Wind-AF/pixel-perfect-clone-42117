@@ -359,6 +359,8 @@ function ProdutoPage() {
                 { img: iconLink, label: "Copiar Link", onClick: copyLink },
                 { img: iconWhats, label: "WhatsApp", onClick: copyLink },
                 { img: iconTelegram, label: "Telegram", onClick: copyLink },
+                { img: iconFacebook, label: "Facebook", onClick: copyLink },
+                { img: iconInstagram, label: "Instagram", onClick: copyLink },
               ].map((s) => (
                 <button key={s.label} onClick={s.onClick} className="flex flex-col items-center gap-1 min-w-[64px]">
                   <span className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center bg-gray-50">
