@@ -279,9 +279,9 @@ function ProdutoPage() {
           <span className="font-semibold text-sm">Vídeos dos criadores</span>
         </div>
         <p className="text-[11px] text-gray-500 mb-2">Conteúdo enviado por quem testou</p>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide snap-x snap-mandatory">
           {creators.map((c) => (
-            <div key={c.name} className="aspect-[3/4] rounded-lg bg-gray-100 relative overflow-hidden">
+            <div key={c.name} className="shrink-0 w-32 aspect-[3/4] rounded-lg bg-gray-100 relative overflow-hidden snap-start">
               <video
                 src={c.video}
                 poster={c.img}
@@ -300,6 +300,7 @@ function ProdutoPage() {
             </div>
           ))}
         </div>
+
       </section>
 
       {/* Avaliações */}
