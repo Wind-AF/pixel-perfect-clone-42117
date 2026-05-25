@@ -47,8 +47,8 @@ function CheckoutPage() {
 
   const shippingOptions: ShippingOption[] = useMemo(
     () => [
-      { id: "jadlog", name: "JadLog", days: "Receba em até 2 dias úteis", price: freeShipping ? 0 : 25.5 },
-      { id: "sedex", name: "Sedex-Express", days: "Receba em até 4 dias úteis", price: freeShipping ? 0 : 17.5 },
+      { id: "jadlog", name: "JadLog", days: "Receba em até 2 dias úteis", price: freeShipping ? 0 : 16.23, oldPrice: freeShipping ? undefined : 62.44 },
+      { id: "sedex", name: "Sedex-Express", days: "Receba em até 4 dias úteis", price: 9.34, oldPrice: 32.71 },
       { id: "correio", name: "Correio", days: "Receba em até 7 dias úteis", price: 0 },
     ],
     [freeShipping],
