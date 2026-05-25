@@ -55,7 +55,7 @@ function useRotatingSubtitle() {
   );
 }
 
-type Step = 1 | 2 | 4;
+type Step = 1 | 2 | 3 | 4;
 export type Customer = { email: string; phone: string; name: string; cpf: string };
 
 type Bump = {
@@ -65,7 +65,8 @@ type Bump = {
   price: number;
   old: number;
   note?: string;
-  variants?: string[];
+  variantLabel: string;
+  variants: string[];
 };
 
 const BUMPS: Bump[] = [
@@ -75,6 +76,8 @@ const BUMPS: Bump[] = [
     img: bumpLegend,
     price: 12.7,
     old: 39.58,
+    variantLabel: "Tamanho",
+    variants: ["Único"],
   },
   {
     id: "bump-caixinha",
@@ -82,6 +85,7 @@ const BUMPS: Bump[] = [
     img: bumpCaixinha,
     price: 8.98,
     old: 37.58,
+    variantLabel: "Cor",
     variants: ["Preto", "Dourado"],
   },
   {
@@ -90,6 +94,8 @@ const BUMPS: Bump[] = [
     img: bumpAdesivo,
     price: 19.99,
     old: 59.99,
+    variantLabel: "Tamanho",
+    variants: ["Único"],
   },
   {
     id: "bump-neymar-lote",
@@ -98,6 +104,8 @@ const BUMPS: Bump[] = [
     price: 4.9,
     old: 31.9,
     note: "Após adicionar 1x: 12% de sorte",
+    variantLabel: "Cor",
+    variants: ["Único"],
   },
   {
     id: "bump-coca",
@@ -105,6 +113,8 @@ const BUMPS: Bump[] = [
     img: bumpCoca,
     price: 29.9,
     old: 79.9,
+    variantLabel: "Tamanho",
+    variants: ["Único"],
   },
 ];
 
@@ -126,15 +136,17 @@ function CheckoutPage() {
 
   const goBack = () => {
     if (step === 1) navigate({ to: "/carrinho" });
-    else setStep(1);
+    else if (step === 2) setStep(1);
+    else if (step === 3) setStep(2);
+    else setStep(3);
   };
 
-  const addBump = (b: Bump, variant?: string) => {
-    const suffix = variant ? `-${variant}` : "";
+  const addBump = (b: Bump, variant: string) => {
+    const suffix = `-${variant}`;
     addItem(
       {
         id: `${b.id}${suffix}`,
-        name: variant ? `${b.name} — ${variant}` : b.name,
+        name: `${b.name} — ${variant}`,
         img: b.img,
         price: `R$ ${fmt(b.price)}`,
       },
@@ -143,14 +155,9 @@ function CheckoutPage() {
   };
 
   const handleBumpClick = (b: Bump) => {
-    if (b.variants && b.variants.length > 0) {
-      setVariantModal(b);
-    } else {
-      addBump(b);
-    }
+    setVariantModal(b);
   };
 
-  // Build interleaved list: cart items first, then bumps not yet in cart
   const cartItems = items;
   const bumpsToShow = BUMPS.filter(
     (b) => !items.some((i) => i.id === b.id || i.id.startsWith(b.id + "-")),
@@ -178,20 +185,18 @@ function CheckoutPage() {
           </div>
           <div className="w-5" />
         </div>
+        {step >= 2 && step <= 4 && (
+          <div className="max-w-3xl mx-auto px-6 pb-3">
+            <StepIndicator current={step as 2 | 3 | 4} />
+          </div>
+        )}
       </header>
 
       <main className="max-w-3xl mx-auto px-3 pt-3">
         {step === 1 && (
           <Step1
             cartItems={cartItems}
-            bumpsToShow={bumpsToShow}
             updateQty={updateQty}
-            onBumpClick={handleBumpClick}
-            getBumpCount={(b) =>
-              items
-                .filter((i) => i.id === b.id || i.id.startsWith(b.id + "-"))
-                .reduce((s, i) => s + i.qty, 0)
-            }
           />
         )}
         {step === 2 && (
@@ -199,8 +204,23 @@ function CheckoutPage() {
             initial={customer}
             onNext={(c) => {
               setCustomer(c);
-              setStep(4);
+              setStep(3);
             }}
+          />
+        )}
+        {step === 3 && (
+          <Step3
+            bumpsToShow={bumpsToShow}
+            onBumpClick={handleBumpClick}
+            getBumpCount={(b) =>
+              items
+                .filter((i) => i.id === b.id || i.id.startsWith(b.id + "-"))
+                .reduce((s, i) => s + i.qty, 0)
+            }
+            onContinue={() => setStep(4)}
+            totalFinal={totalFinal}
+            descontos={descontos}
+            itemsCount={items.length}
           />
         )}
         {step === 4 && <Step4 customer={customer} totalFinal={totalFinal} />}
@@ -249,24 +269,64 @@ function CheckoutPage() {
   );
 }
 
-/* ---------- Step 1: Unified products list ---------- */
+/* ---------- Step Indicator ---------- */
+
+function StepIndicator({ current }: { current: 2 | 3 | 4 }) {
+  const steps = [
+    { n: 1, label: "Identificação" },
+    { n: 2, label: "Ofertas" },
+    { n: 3, label: "Pagamento" },
+  ];
+  const activeIdx = current === 2 ? 1 : current === 3 ? 2 : 3;
+  return (
+    <div className="flex items-center justify-between">
+      {steps.map((s, i) => {
+        const done = s.n < activeIdx;
+        const active = s.n === activeIdx;
+        return (
+          <div key={s.n} className="flex items-center flex-1 last:flex-none">
+            <div className="flex flex-col items-center gap-1">
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                  done
+                    ? "bg-emerald-500 text-white"
+                    : active
+                      ? "bg-gray-900 text-white"
+                      : "bg-gray-200 text-gray-500"
+                }`}
+              >
+                {done ? <Check className="w-4 h-4" /> : s.n}
+              </div>
+              <span
+                className={`text-[11px] font-semibold ${active || done ? "text-gray-900" : "text-gray-400"}`}
+              >
+                {s.label}
+              </span>
+            </div>
+            {i < steps.length - 1 && (
+              <div
+                className={`flex-1 h-px mx-2 -mt-4 ${done ? "bg-emerald-500" : "bg-gray-200"}`}
+              />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ---------- Step 1: Cart summary ---------- */
 
 function Step1({
   cartItems,
-  bumpsToShow,
   updateQty,
-  onBumpClick,
-  getBumpCount,
 }: {
   cartItems: CartItem[];
-  bumpsToShow: Bump[];
   updateQty: (id: string, q: number) => void;
-  onBumpClick: (b: Bump) => void;
-  getBumpCount: (b: Bump) => number;
 }) {
   return (
     <div className="space-y-3 pt-1">
-      {cartItems.length === 0 && bumpsToShow.length === BUMPS.length && (
+      {cartItems.length === 0 && (
         <div className="bg-white rounded-xl border border-gray-100 p-6 text-center text-sm text-gray-500">
           Carrinho vazio.{" "}
           <Link to="/" className="text-rose-600 font-semibold">
@@ -306,13 +366,41 @@ function Step1({
           </section>
         );
       })}
+    </div>
+  );
+}
+
+/* ---------- Step 3: Order bumps (penultimate) ---------- */
+
+function Step3({
+  bumpsToShow,
+  onBumpClick,
+  getBumpCount,
+  onContinue,
+  totalFinal,
+  descontos,
+  itemsCount,
+}: {
+  bumpsToShow: Bump[];
+  onBumpClick: (b: Bump) => void;
+  getBumpCount: (b: Bump) => number;
+  onContinue: () => void;
+  totalFinal: number;
+  descontos: number;
+  itemsCount: number;
+}) {
+  return (
+    <div className="space-y-3 pt-1 pb-32">
+      <h2 className="text-center font-bold text-gray-900 text-base pt-2">
+        Acho que você vai gostar destas ofertas ;)
+      </h2>
 
       {bumpsToShow.map((b) => {
         const count = getBumpCount(b);
         const off = Math.max(0, b.old - b.price);
         return (
           <div key={b.id} className="space-y-2">
-            <section className="bg-white shadow-sm border border-slate-200 rounded-xl px-4 py-4">
+            <section className="bg-white shadow-sm border border-dashed border-slate-300 rounded-xl px-4 py-4">
               <div className="flex gap-3">
                 <div className="w-[90px] h-[90px] flex-shrink-0 rounded-lg border border-gray-200 bg-white flex items-center justify-center overflow-hidden">
                   <img src={b.img} alt={b.name} className="w-full h-full object-contain p-1" />
@@ -348,24 +436,39 @@ function Step1({
         );
       })}
 
-      {cartItems.length > 0 && (
-        <div className="bg-white shadow-sm border border-slate-200 rounded-xl px-4 py-4">
-          <h4 className="font-bold text-gray-900 mb-3">Forma de pagamento</h4>
-          <label className="flex items-center gap-3 border-2 border-blue-500 rounded-lg px-3 py-3 cursor-pointer">
-            <img src={pixLogo} alt="PIX" className="w-10 h-10 object-contain" />
-            <span className="flex-1 font-semibold text-gray-900">PIX à vista</span>
-            <input
-              type="radio"
-              defaultChecked
-              readOnly
-              className="accent-blue-600 w-4 h-4"
-            />
-          </label>
+      {bumpsToShow.length === 0 && (
+        <div className="bg-white rounded-xl border border-gray-100 p-6 text-center text-sm text-gray-500">
+          Você já adicionou todas as ofertas disponíveis.
         </div>
       )}
+
+      <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-40">
+        {descontos > 0 && (
+          <div className="bg-rose-50 text-rose-600 text-[13px] text-center py-2 px-3 flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5">
+            <Gift className="w-4 h-4 shrink-0" />
+            <span>
+              Você está economizando <strong>R$ {fmt(descontos)}</strong> neste pedido.
+            </span>
+          </div>
+        )}
+        <div className="max-w-3xl mx-auto px-4 py-2.5 flex items-center justify-between">
+          <span className="text-sm text-gray-500">
+            Total ({itemsCount} {itemsCount === 1 ? "item" : "itens"})
+          </span>
+          <span className="text-lg font-bold text-gray-900">R$ {fmt(totalFinal)}</span>
+        </div>
+        <button
+          onClick={onContinue}
+          className="block w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3.5 text-sm uppercase tracking-wide"
+        >
+          Ir para pagamento
+        </button>
+      </footer>
     </div>
   );
 }
+
+
 
 function QtyStepper({
   qty,
@@ -434,15 +537,15 @@ function VariantModal({
         </div>
 
         <div className="mt-4">
-          <label className="block font-semibold text-gray-900 text-sm mb-2">Cor</label>
+          <label className="block font-semibold text-gray-900 text-sm mb-2">{bump.variantLabel}</label>
           <div className="relative">
             <select
               value={variant}
               onChange={(e) => setVariant(e.target.value)}
               className="w-full h-12 rounded-lg border-2 border-blue-500 bg-blue-50/30 px-3 text-sm appearance-none focus:outline-none"
             >
-              <option value="">Selecione a cor...</option>
-              {(bump.variants ?? []).map((v) => (
+              <option value="">Selecione {bump.variantLabel === "Cor" ? "a cor" : "o tamanho"}...</option>
+              {bump.variants.map((v) => (
                 <option key={v} value={v}>
                   {v}
                 </option>
@@ -549,7 +652,7 @@ function Step2({ initial, onNext }: { initial: Customer; onNext: (c: Customer) =
           type="submit"
           className="w-full h-12 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-base uppercase tracking-wide"
         >
-          Gerar PIX
+          Continuar
         </button>
       </form>
     </div>
