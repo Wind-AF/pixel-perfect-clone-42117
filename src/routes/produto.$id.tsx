@@ -157,10 +157,10 @@ function ProdutoPage() {
             <button aria-label="Compartilhar" onClick={() => setShareOpen(true)}>
               <img src={compartilhar} alt="" width={20} height={20} />
             </button>
-            <button aria-label="Carrinho" className="relative">
+            <Link to="/carrinho" aria-label="Carrinho" className="relative">
               <img src={carrinho} alt="" width={20} height={20} />
               <span className="absolute -top-2 -right-3 flex w-4 h-4 bg-rose-500 text-white items-center justify-center rounded-full text-[9px] font-bold">{cartCount}</span>
-            </button>
+            </Link>
             <button aria-label="Mais" className="text-gray-700"><img src={iconDots} alt="" width={18} height={18} /></button>
           </div>
         </div>
