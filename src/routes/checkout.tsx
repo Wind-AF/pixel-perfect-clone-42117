@@ -187,7 +187,7 @@ function CheckoutPage() {
         </div>
         {step >= 2 && step <= 4 && (
           <div className="max-w-3xl mx-auto px-6 pb-3">
-            <StepIndicator current={step} />
+            <StepIndicator current={step as 2 | 3 | 4} />
           </div>
         )}
       </header>
