@@ -537,15 +537,15 @@ function VariantModal({
         </div>
 
         <div className="mt-4">
-          <label className="block font-semibold text-gray-900 text-sm mb-2">Cor</label>
+          <label className="block font-semibold text-gray-900 text-sm mb-2">{bump.variantLabel}</label>
           <div className="relative">
             <select
               value={variant}
               onChange={(e) => setVariant(e.target.value)}
               className="w-full h-12 rounded-lg border-2 border-blue-500 bg-blue-50/30 px-3 text-sm appearance-none focus:outline-none"
             >
-              <option value="">Selecione a cor...</option>
-              {(bump.variants ?? []).map((v) => (
+              <option value="">Selecione {bump.variantLabel === "Cor" ? "a cor" : "o tamanho"}...</option>
+              {bump.variants.map((v) => (
                 <option key={v} value={v}>
                   {v}
                 </option>
