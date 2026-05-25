@@ -656,6 +656,40 @@ function Step4() {
   };
 
   const finalize = () => {
+    const eventId = (crypto as Crypto & { randomUUID: () => string }).randomUUID();
+    const value = items.reduce((s, i) => {
+      const n = Number(String(i.price).replace(/[^\d,.-]/g, "").replace(",", "."));
+      return s + (isNaN(n) ? 0 : n) * i.qty;
+    }, 0);
+    const contents = items.map((i) => ({
+      content_id: i.id,
+      content_name: i.name,
+      quantity: i.qty,
+      price: Number(String(i.price).replace(/[^\d,.-]/g, "").replace(",", ".")) || 0,
+    }));
+
+    // Client-side pixel
+    const ttq = (window as unknown as { ttq?: { track: (e: string, p?: unknown, o?: unknown) => void } }).ttq;
+    ttq?.track(
+      "CompletePayment",
+      { value, currency: "BRL", contents, content_type: "product" },
+      { event_id: eventId },
+    );
+
+    // Server-side Events API (deduplicated by event_id)
+    fetch("/api/tiktok-event", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        event: "CompletePayment",
+        event_id: eventId,
+        url: window.location.href,
+        value,
+        currency: "BRL",
+        contents,
+      }),
+    }).catch(() => {});
+
     alert("Compra finalizada! 🎉");
     navigate({ to: "/" });
   };
