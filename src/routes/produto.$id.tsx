@@ -311,6 +311,12 @@ function ProdutoPage() {
           { name: "Joyce Almeida", avatar: reviewerJoyce, date: "2026-05-10 09:22:48", text: "Amei! Superou minhas expectativas, virei cliente fiel da loja ❤️" },
           { name: "José Henrique", avatar: reviewerJose, date: "2026-05-06 14:47:02", text: "Produto top, valor justo e entrega antes do prazo. Já comprei de novo!" },
           { name: "Júlia & Rafael", avatar: reviewerJuliaRafael, date: "2026-05-02 21:13:55", text: "A gente comprou pra usar junto e amamos! Qualidade impecável, vale cada centavo." },
+          { name: "Lucas Oliveira", avatar: reviewerLucas, date: "2026-04-28 16:08:14", text: "Álbum lindo demais, capa firme e impressão de qualidade. Já comprei os pacotinhos pra começar a colar 🔥⚽", photos: [reviewFoto42, reviewFoto43, reviewFoto44, reviewFoto45] },
+          { name: "Camila Souza", avatar: reviewerCamila, date: "2026-04-24 12:31:50", text: "Chegou rapidinho, embalagem caprichada. Meu filho amou de presente, recomendo muito!" },
+          { name: "Beatriz Lima", avatar: reviewerBia, date: "2026-04-20 19:42:07", text: "Atendimento ótimo e produto exatamente como nas fotos. Voltarei a comprar com certeza ✨" },
+          { name: "Pedro Henrique", avatar: reviewerPedro, date: "2026-04-16 08:55:33", text: "Muito bom, valeu cada centavo. Recebi antes do prazo e veio tudo certinho." },
+          { name: "Thiago Martins", avatar: reviewerThiago, date: "2026-04-12 21:17:22", text: "Top demais! Qualidade impressionante pelo preço. Recomendo de olhos fechados." },
+          { name: "Marcos Vinícius", avatar: reviewerMarcos, date: "2026-04-08 14:03:46", text: "Comprei pra colecionar e amei. Loja confiável, entrega rápida e produto original." },
         ].map((r, idx) => (
           <div key={r.name} className={`pt-3 ${idx === 0 ? "border-t border-gray-100" : "border-t border-gray-100 mt-3"}`}>
             <div className="flex items-center gap-2 mb-1">
