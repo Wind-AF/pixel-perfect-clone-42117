@@ -251,54 +251,48 @@ function CheckoutPage() {
           </div>
           <div className="w-5" />
         </div>
-        {!isFinalStep && (
-          <div className="max-w-3xl mx-auto px-6 pb-3">
-            <StepIndicator current={step as 1 | 2 | 3} />
-          </div>
-        )}
       </header>
 
       <main className="max-w-3xl mx-auto px-3 pt-3 space-y-3">
+        {!isFinalStep && summaryNode}
+
+        {!isFinalStep && (
+          <div className="bg-white rounded-xl border border-gray-200 px-4 py-4">
+            <StepIndicator current={step as 1 | 2 | 3} />
+          </div>
+        )}
+
         {step === 1 && (
-          <>
-            {summaryNode}
-            <StepIdentificacao
-              initial={customer}
-              onNext={(c) => {
-                setCustomer(c);
-                setStep(2);
-              }}
-            />
-          </>
+          <StepIdentificacao
+            initial={customer}
+            onNext={(c) => {
+              setCustomer(c);
+              setStep(2);
+            }}
+          />
         )}
 
         {step === 2 && (
-          <>
-            {summaryNode}
-            <StepEntrega
-              initial={address}
-              onNext={(a) => {
-                setAddress(a);
-                setStep(3);
-              }}
-            />
-          </>
+          <StepEntrega
+            initial={address}
+            onNext={(a) => {
+              setAddress(a);
+              setStep(3);
+            }}
+          />
         )}
 
         {step === 3 && (
-          <>
-            {summaryNode}
-            <StepPagamento
-              bumpsToShow={bumpsToShow}
-              onBumpClick={(b) => setVariantModal(b)}
-              getBumpCount={(b) =>
-                items
-                  .filter((i) => i.id === b.id || i.id.startsWith(b.id + "-"))
-                  .reduce((s, i) => s + i.qty, 0)
-              }
-              onFinish={() => setStep(4)}
-            />
-          </>
+          <StepPagamento
+            bumpsToShow={bumpsToShow}
+            onBumpClick={(b) => setVariantModal(b)}
+            getBumpCount={(b) =>
+              items
+                .filter((i) => i.id === b.id || i.id.startsWith(b.id + "-"))
+                .reduce((s, i) => s + i.qty, 0)
+            }
+            onFinish={() => setStep(4)}
+          />
         )}
 
         {step === 4 && (
