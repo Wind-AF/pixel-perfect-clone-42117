@@ -7,7 +7,6 @@ import {
   Gift,
   Check,
   ChevronDown,
-  ChevronUp,
   Ticket,
   Copy,
   Info,
