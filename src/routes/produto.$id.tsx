@@ -83,6 +83,12 @@ const creators = [
 const reviewPhotos = [reviewFoto1, reviewFoto2, reviewFoto3, reviewFoto4, reviewFoto5, reviewFoto6, reviewFoto7, reviewFoto8, reviewFoto9, reviewFoto10, reviewFoto11, reviewFoto12, reviewFoto13, reviewFoto14, reviewFoto15, reviewFoto16, reviewFoto17, reviewFoto18, reviewFoto19, reviewFoto20, reviewFoto21, reviewFoto22, reviewFoto23, reviewFoto24, reviewFoto25, reviewFoto26, reviewFoto27, reviewFoto28, reviewFoto29, reviewFoto30, reviewFoto31, reviewFoto32, reviewFoto33, reviewFoto34, reviewFoto35, reviewFoto36, reviewFoto37, reviewFoto38, reviewFoto39, reviewFoto40, reviewFoto41];
 
 function ProdutoPage() {
+  const [shareOpen, setShareOpen] = useState(false);
+  const copyLink = () => {
+    if (typeof window !== "undefined") {
+      navigator.clipboard?.writeText(window.location.href).catch(() => {});
+    }
+  };
   const { id } = Route.useParams();
   const router = useRouter();
   const product = getProduct(id);
@@ -107,11 +113,11 @@ function ProdutoPage() {
       <header className="sticky top-0 z-30 bg-white border-b border-gray-200">
         <div className="flex items-center justify-between p-3">
           <button onClick={() => router.history.back()} aria-label="Voltar" className="text-gray-700">
-            <ChevronLeft className="w-5 h-5" />
+            <img src={iconBack} alt="" width={18} height={18} />
           </button>
           <div className="flex-1" />
           <div className="flex items-center gap-4 mr-1">
-            <button aria-label="Compartilhar">
+            <button aria-label="Compartilhar" onClick={() => setShareOpen(true)}>
               <img src={compartilhar} alt="" width={20} height={20} />
             </button>
             <button aria-label="Carrinho" className="relative">
@@ -202,7 +208,7 @@ function ProdutoPage() {
         </div>
         <div className="h-px bg-gray-100 mx-4" />
         <div className="px-4 py-2 flex items-center gap-2">
-          <Shield className="w-4 h-4 text-gray-600" />
+          <img src={iconCheck} alt="" width={14} height={14} className="opacity-70" />
           <span className="text-xs">Devoluções gratuitas em 30 dias • Cancelamento fácil</span>
         </div>
 
@@ -218,14 +224,15 @@ function ProdutoPage() {
       <section className="bg-amber-50/60 mx-3 rounded-lg p-3">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-1.5 text-amber-700 text-xs font-semibold">
-            <Shield className="w-4 h-4" /> Proteção do cliente
+            <span className="inline-block w-4 h-4 rounded-full bg-gradient-to-br from-amber-300 to-yellow-500" />
+            Proteção do cliente
           </div>
           <ChevronRight className="w-3.5 h-3.5 text-amber-700" />
         </div>
         <ul className="grid grid-cols-2 gap-y-1 text-[11px] text-gray-800">
           {["Devolução gratuita", "Reembolso automático por danos", "Pagamento seguro", "Cupom por atraso na coleta"].map((t) => (
-            <li key={t} className="flex items-center gap-1">
-              <Check className="w-3 h-3 text-amber-600" /> {t}
+            <li key={t} className="flex items-center gap-1.5">
+              <img src={iconCheck} alt="" width={10} height={10} /> {t}
             </li>
           ))}
         </ul>
