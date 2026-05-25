@@ -165,14 +165,21 @@ function CartPage() {
             <span>Total (itens):</span>
             <span className="text-lg font-bold text-gray-900">R$ {fmt(total)}</span>
           </div>
-          <Link
-            to="/checkout"
-            disabled={items.length === 0}
-            className="block text-center w-full bg-rose-600 text-white py-3 rounded-lg font-semibold text-sm shadow-sm aria-disabled:opacity-50"
-            aria-disabled={items.length === 0}
-          >
-            Finalizar Compra
-          </Link>
+          {items.length === 0 ? (
+            <button
+              disabled
+              className="w-full bg-rose-600 text-white py-3 rounded-lg font-semibold text-sm shadow-sm opacity-50"
+            >
+              Finalizar Compra
+            </button>
+          ) : (
+            <Link
+              to="/checkout"
+              className="block text-center w-full bg-rose-600 text-white py-3 rounded-lg font-semibold text-sm shadow-sm"
+            >
+              Finalizar Compra
+            </Link>
+          )}
         </div>
       </footer>
     </div>
