@@ -146,13 +146,18 @@ function CheckoutPage() {
           <span className="text-lg font-bold text-gray-900">R$ {fmt(totalFinal)}</span>
         </div>
         {step === 1 ? (
-          <button
-            onClick={() => setStep(2)}
-            disabled={items.length === 0}
-            className="block w-full bg-rose-500 text-white font-bold py-3.5 text-sm disabled:opacity-50"
-          >
-            O cupom expira em {timer}
-          </button>
+          <>
+            <div className="bg-rose-500/10 text-rose-600 font-semibold py-2 text-xs text-center">
+              O cupom expira em {timer}
+            </div>
+            <button
+              onClick={() => setStep(2)}
+              disabled={items.length === 0}
+              className="block w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3.5 text-sm disabled:opacity-50 uppercase tracking-wide"
+            >
+              Finalizar Compra
+            </button>
+          </>
         ) : (
           <div className="bg-rose-500 text-white font-bold py-3.5 text-sm text-center">
             O cupom expira em {timer}
