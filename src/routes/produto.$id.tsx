@@ -1,6 +1,15 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Shield, Truck, Check, Star, Video } from "lucide-react";
+import { ChevronRight, Truck, Star, Video } from "lucide-react";
+import iconBack from "@/assets/icon-back.png";
+import iconSave from "@/assets/icon-save.png";
+import iconRaio from "@/assets/icon-raio.png";
+import iconCheck from "@/assets/icon-check.png";
+import iconWhats from "@/assets/icon-whatsapp.png";
+import iconTelegram from "@/assets/icon-telegram.png";
+import iconLink from "@/assets/icon-link.png";
+import creatorNandy from "@/assets/creator-nandy.jpg";
+import creatorMateus from "@/assets/creator-mateus.jpg";
 import { getProduct, products } from "@/data/products";
 import carrinho from "@/assets/carrinho.png";
 import carrinho2 from "@/assets/carrinho-2.png";
@@ -65,13 +74,21 @@ export const Route = createFileRoute("/produto/$id")({
 
 const creators = [
   { name: "Carla Maria", img: creatorCarla },
+  { name: "Nandy zorzan", img: creatorNandy },
   { name: "Califórnices", img: creatorCalifornices },
+  { name: "Matheus Alberto", img: creatorMateus },
   { name: "Andre Arthur", img: creatorAndre },
 ];
 
 const reviewPhotos = [reviewFoto1, reviewFoto2, reviewFoto3, reviewFoto4, reviewFoto5, reviewFoto6, reviewFoto7, reviewFoto8, reviewFoto9, reviewFoto10, reviewFoto11, reviewFoto12, reviewFoto13, reviewFoto14, reviewFoto15, reviewFoto16, reviewFoto17, reviewFoto18, reviewFoto19, reviewFoto20, reviewFoto21, reviewFoto22, reviewFoto23, reviewFoto24, reviewFoto25, reviewFoto26, reviewFoto27, reviewFoto28, reviewFoto29, reviewFoto30, reviewFoto31, reviewFoto32, reviewFoto33, reviewFoto34, reviewFoto35, reviewFoto36, reviewFoto37, reviewFoto38, reviewFoto39, reviewFoto40, reviewFoto41];
 
 function ProdutoPage() {
+  const [shareOpen, setShareOpen] = useState(false);
+  const copyLink = () => {
+    if (typeof window !== "undefined") {
+      navigator.clipboard?.writeText(window.location.href).catch(() => {});
+    }
+  };
   const { id } = Route.useParams();
   const router = useRouter();
   const product = getProduct(id);
@@ -96,11 +113,11 @@ function ProdutoPage() {
       <header className="sticky top-0 z-30 bg-white border-b border-gray-200">
         <div className="flex items-center justify-between p-3">
           <button onClick={() => router.history.back()} aria-label="Voltar" className="text-gray-700">
-            <ChevronLeft className="w-5 h-5" />
+            <img src={iconBack} alt="" width={18} height={18} />
           </button>
           <div className="flex-1" />
           <div className="flex items-center gap-4 mr-1">
-            <button aria-label="Compartilhar">
+            <button aria-label="Compartilhar" onClick={() => setShareOpen(true)}>
               <img src={compartilhar} alt="" width={20} height={20} />
             </button>
             <button aria-label="Carrinho" className="relative">
@@ -146,7 +163,8 @@ function ProdutoPage() {
           </div>
           <div className="flex flex-col items-end">
             <div className="flex items-center gap-1 text-white text-[11px] font-semibold">
-              ⚡ Oferta Relâmpago
+              <img src={iconRaio} alt="" width={11} height={11} style={{ filter: "brightness(0) invert(1)" }} />
+              Oferta Relâmpago
             </div>
             <span className="text-white/90 text-xs font-semibold mt-0.5">Termina em 04:43</span>
           </div>
@@ -168,7 +186,7 @@ function ProdutoPage() {
         <div className="flex justify-between items-start gap-3">
           <h1 className="flex-1 text-base font-semibold leading-tight">{product.name}</h1>
           <button onClick={() => setSaved((v) => !v)} aria-label="Salvar" className="p-1">
-            <img src={setaCima} alt="" width={22} height={22} className={saved ? "opacity-100" : "opacity-60"} />
+            <img src={iconSave} alt="" width={22} height={22} className={saved ? "opacity-100" : "opacity-60"} style={saved ? { filter: "invert(57%) sepia(95%) saturate(2493%) hue-rotate(326deg) brightness(96%) contrast(101%)" } : undefined} />
           </button>
         </div>
         <div className="flex items-center gap-1 mt-1">
@@ -191,7 +209,7 @@ function ProdutoPage() {
         </div>
         <div className="h-px bg-gray-100 mx-4" />
         <div className="px-4 py-2 flex items-center gap-2">
-          <Shield className="w-4 h-4 text-gray-600" />
+          <img src={iconCheck} alt="" width={14} height={14} className="opacity-70" />
           <span className="text-xs">Devoluções gratuitas em 30 dias • Cancelamento fácil</span>
         </div>
 
@@ -207,14 +225,15 @@ function ProdutoPage() {
       <section className="bg-amber-50/60 mx-3 rounded-lg p-3">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-1.5 text-amber-700 text-xs font-semibold">
-            <Shield className="w-4 h-4" /> Proteção do cliente
+            <span className="inline-block w-4 h-4 rounded-full bg-gradient-to-br from-amber-300 to-yellow-500" />
+            Proteção do cliente
           </div>
           <ChevronRight className="w-3.5 h-3.5 text-amber-700" />
         </div>
         <ul className="grid grid-cols-2 gap-y-1 text-[11px] text-gray-800">
           {["Devolução gratuita", "Reembolso automático por danos", "Pagamento seguro", "Cupom por atraso na coleta"].map((t) => (
-            <li key={t} className="flex items-center gap-1">
-              <Check className="w-3 h-3 text-amber-600" /> {t}
+            <li key={t} className="flex items-center gap-1.5">
+              <img src={iconCheck} alt="" width={10} height={10} /> {t}
             </li>
           ))}
         </ul>
@@ -296,6 +315,14 @@ function ProdutoPage() {
         </div>
       </section>
 
+      {/* Footer Políticas */}
+      <footer className="mt-5 px-4 py-4 border-t border-gray-200 bg-white text-center text-[12px] text-gray-500 leading-relaxed">
+        <strong className="block text-gray-800 text-[12px] mb-1.5">Políticas e Privacidade</strong>
+        <a href="#" className="text-blue-600 underline font-semibold">Política de Privacidade</a>
+        <span className="block mt-1.5">Seus dados são tratados conforme a legislação vigente e usados apenas para processar pedidos e atendimento.</span>
+      </footer>
+
+
       {/* Sticky bottom CTA */}
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[500px] bg-white border-t border-gray-200 px-3 py-2 flex items-center gap-2 z-40">
         <button className="flex flex-col items-center justify-center text-[10px] text-gray-600 w-12">
@@ -309,6 +336,33 @@ function ProdutoPage() {
           Comprar agora
         </button>
       </div>
+
+      {/* Share drawer */}
+      {shareOpen && (
+        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50" onClick={() => setShareOpen(false)}>
+          <div className="w-full max-w-[500px] bg-white rounded-t-2xl p-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-semibold text-sm">Compartilhar</span>
+              <button onClick={() => setShareOpen(false)} className="text-gray-500 text-xl leading-none">×</button>
+            </div>
+            <div className="flex gap-5 overflow-x-auto pb-2">
+              {[
+                { img: iconLink, label: "Copiar Link", onClick: copyLink },
+                { img: iconWhats, label: "WhatsApp", onClick: copyLink },
+                { img: iconTelegram, label: "Telegram", onClick: copyLink },
+              ].map((s) => (
+                <button key={s.label} onClick={s.onClick} className="flex flex-col items-center gap-1 min-w-[64px]">
+                  <span className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center bg-gray-50">
+                    <img src={s.img} alt="" className="w-9 h-9 object-contain" />
+                  </span>
+                  <span className="text-[11px] text-gray-700">{s.label}</span>
+                </button>
+              ))}
+            </div>
+            <button onClick={() => setShareOpen(false)} className="mt-3 w-full h-10 rounded-full bg-gray-100 text-gray-700 text-sm font-semibold">Cancelar</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
