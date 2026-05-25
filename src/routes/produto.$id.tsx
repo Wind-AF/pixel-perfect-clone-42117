@@ -70,6 +70,16 @@ import reviewFoto38 from "@/assets/review-foto-38.jpg";
 import reviewFoto39 from "@/assets/review-foto-39.jpg";
 import reviewFoto40 from "@/assets/review-foto-40.jpg";
 import reviewFoto41 from "@/assets/review-foto-41.jpg";
+import reviewFoto42 from "@/assets/review-foto-42.jpg";
+import reviewFoto43 from "@/assets/review-foto-43.jpg";
+import reviewFoto44 from "@/assets/review-foto-44.jpg";
+import reviewFoto45 from "@/assets/review-foto-45.jpg";
+import reviewerLucas from "@/assets/reviewer-lucas.jpg";
+import reviewerCamila from "@/assets/reviewer-camila.jpg";
+import reviewerBia from "@/assets/reviewer-bia.jpg";
+import reviewerPedro from "@/assets/reviewer-pedro.jpg";
+import reviewerThiago from "@/assets/reviewer-thiago.jpg";
+import reviewerMarcos from "@/assets/reviewer-marcos.jpg";
 
 export const Route = createFileRoute("/produto/$id")({
   component: ProdutoPage,
