@@ -14,6 +14,14 @@ import creatorCalifornices from "@/assets/creator-californices.jpg";
 import reviewFoto1 from "@/assets/review-foto-1.png";
 import reviewFoto2 from "@/assets/review-foto-2.png";
 import reviewFoto3 from "@/assets/review-foto-3.jpg";
+import reviewFoto4 from "@/assets/review-foto-4.jpg";
+import reviewFoto5 from "@/assets/review-foto-5.jpg";
+import reviewFoto6 from "@/assets/review-foto-6.jpg";
+import reviewFoto7 from "@/assets/review-foto-7.jpg";
+import reviewFoto8 from "@/assets/review-foto-8.jpg";
+import reviewFoto9 from "@/assets/review-foto-9.jpg";
+import reviewFoto10 from "@/assets/review-foto-10.jpg";
+import reviewFoto11 from "@/assets/review-foto-11.jpg";
 
 export const Route = createFileRoute("/produto/$id")({
   component: ProdutoPage,
@@ -31,7 +39,7 @@ const creators = [
   { name: "Andre Arthur", img: creatorAndre },
 ];
 
-const reviewPhotos = [reviewFoto1, reviewFoto2, reviewFoto3];
+const reviewPhotos = [reviewFoto1, reviewFoto2, reviewFoto3, reviewFoto4, reviewFoto5, reviewFoto6, reviewFoto7, reviewFoto8, reviewFoto9, reviewFoto10, reviewFoto11];
 
 function ProdutoPage() {
   const { id } = Route.useParams();
