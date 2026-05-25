@@ -6,6 +6,7 @@ import bilhete from "@/assets/bilhete.png";
 import carrinho from "@/assets/carrinho.png";
 import compartilhar from "@/assets/compartilhar.png";
 import { products } from "@/data/products";
+import { useCart } from "@/hooks/use-cart";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -20,6 +21,7 @@ function Index() {
   const [following, setFollowing] = useState(false);
   const [showPopup, setShowPopup] = useState(true);
   const [countdown, setCountdown] = useState({ h: 23, m: 59, s: 58 });
+  const { count: cartCount } = useCart();
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -98,7 +100,7 @@ function Index() {
             </button>
             <button aria-label="Carrinho" className="relative">
               <img src={carrinho} alt="Carrinho" width={22} height={22} />
-              <span className="absolute -top-2 -right-3 flex w-5 h-5 bg-rose-600 text-white items-center justify-center rounded-full text-[10px] font-bold">0</span>
+              <span className="absolute -top-2 -right-3 flex w-5 h-5 bg-rose-600 text-white items-center justify-center rounded-full text-[10px] font-bold">{cartCount}</span>
             </button>
           </div>
         </div>
