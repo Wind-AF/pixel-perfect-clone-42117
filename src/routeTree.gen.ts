@@ -14,6 +14,7 @@ import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProdutoIdRouteImport } from './routes/produto.$id'
 import { Route as ApiTiktokEventRouteImport } from './routes/api/tiktok-event'
+import { Route as ApiPixCreateRouteImport } from './routes/api/pix/create'
 
 const CheckoutRoute = CheckoutRouteImport.update({
   id: '/checkout',
@@ -40,6 +41,11 @@ const ApiTiktokEventRoute = ApiTiktokEventRouteImport.update({
   path: '/api/tiktok-event',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPixCreateRoute = ApiPixCreateRouteImport.update({
+  id: '/api/pix/create',
+  path: '/api/pix/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/api/tiktok-event': typeof ApiTiktokEventRoute
   '/produto/$id': typeof ProdutoIdRoute
+  '/api/pix/create': typeof ApiPixCreateRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/api/tiktok-event': typeof ApiTiktokEventRoute
   '/produto/$id': typeof ProdutoIdRoute
+  '/api/pix/create': typeof ApiPixCreateRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,6 +70,7 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/api/tiktok-event': typeof ApiTiktokEventRoute
   '/produto/$id': typeof ProdutoIdRoute
+  '/api/pix/create': typeof ApiPixCreateRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -71,8 +80,15 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/api/tiktok-event'
     | '/produto/$id'
+    | '/api/pix/create'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/carrinho' | '/checkout' | '/api/tiktok-event' | '/produto/$id'
+  to:
+    | '/'
+    | '/carrinho'
+    | '/checkout'
+    | '/api/tiktok-event'
+    | '/produto/$id'
+    | '/api/pix/create'
   id:
     | '__root__'
     | '/'
@@ -80,6 +96,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/api/tiktok-event'
     | '/produto/$id'
+    | '/api/pix/create'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -88,6 +105,7 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   ApiTiktokEventRoute: typeof ApiTiktokEventRoute
   ProdutoIdRoute: typeof ProdutoIdRoute
+  ApiPixCreateRoute: typeof ApiPixCreateRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -127,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTiktokEventRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/pix/create': {
+      id: '/api/pix/create'
+      path: '/api/pix/create'
+      fullPath: '/api/pix/create'
+      preLoaderRoute: typeof ApiPixCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -136,7 +161,18 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   ApiTiktokEventRoute: ApiTiktokEventRoute,
   ProdutoIdRoute: ProdutoIdRoute,
+  ApiPixCreateRoute: ApiPixCreateRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
