@@ -411,11 +411,13 @@ function Step3({
   value,
   onChange,
   freeShipping,
+  onNext,
 }: {
   options: ShippingOption[];
   value: string;
   onChange: (id: string) => void;
   freeShipping: boolean;
+  onNext: () => void;
 }) {
   const [form, setForm] = useState({
     cep: "",
