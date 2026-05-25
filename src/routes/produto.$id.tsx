@@ -59,7 +59,7 @@ const creators = [
   { name: "Andre Arthur", img: creatorAndre },
 ];
 
-const reviewPhotos = [reviewFoto1, reviewFoto2, reviewFoto3, reviewFoto4, reviewFoto5, reviewFoto6, reviewFoto7, reviewFoto8, reviewFoto9, reviewFoto10, reviewFoto11, reviewFoto12, reviewFoto13, reviewFoto14, reviewFoto15, reviewFoto16, reviewFoto17, reviewFoto18, reviewFoto19, reviewFoto20, reviewFoto21];
+const reviewPhotos = [reviewFoto1, reviewFoto2, reviewFoto3, reviewFoto4, reviewFoto5, reviewFoto6, reviewFoto7, reviewFoto8, reviewFoto9, reviewFoto10, reviewFoto11, reviewFoto12, reviewFoto13, reviewFoto14, reviewFoto15, reviewFoto16, reviewFoto17, reviewFoto18, reviewFoto19, reviewFoto20, reviewFoto21, reviewFoto22, reviewFoto23, reviewFoto24, reviewFoto25, reviewFoto26, reviewFoto27, reviewFoto28, reviewFoto29, reviewFoto30, reviewFoto31];
 
 function ProdutoPage() {
   const { id } = Route.useParams();
