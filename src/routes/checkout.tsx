@@ -1,7 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, ShieldCheck, Lock, Truck, X, Ticket, Gift, Check } from "lucide-react";
+import { ArrowLeft, ShieldCheck, Lock, Truck, X, Ticket, Gift, Check, ChevronDown } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
+import bumpNeymar from "@/assets/bump-neymar.jpg";
+import bumpLegend from "@/assets/bump-legend.jpg";
+import bumpCaixinha from "@/assets/bump-caixinha.jpg";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
