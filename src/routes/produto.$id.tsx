@@ -82,11 +82,15 @@ export const Route = createFileRoute("/produto/$id")({
 });
 
 const creators = [
-  { name: "Carla Maria", img: creatorCarla },
-  { name: "Nandy zorzan", img: creatorNandy },
-  { name: "Califórnices", img: creatorCalifornices },
-  { name: "Matheus Alberto", img: creatorMateus },
-  { name: "Andre Arthur", img: creatorAndre },
+  { name: "Carla Maria", img: creatorCarla, video: "/videos/shop.mp4" },
+  { name: "Nandy zorzan", img: creatorNandy, video: "/videos/shop-1.mp4" },
+  { name: "Califórnices", img: creatorCalifornices, video: "/videos/shop-2.mp4" },
+  { name: "Matheus Alberto", img: creatorMateus, video: "/videos/shop-3.mp4" },
+  { name: "Andre Arthur", img: creatorAndre, video: "/videos/shop-4.mp4" },
+  { name: "Bruna Lopes", img: creatorCarla, video: "/videos/shop-5.mp4" },
+  { name: "Leticia Rocha", img: creatorNandy, video: "/videos/shop-6.mp4" },
+  { name: "Paula Sant'", img: creatorCalifornices, video: "/videos/shop-7.mp4" },
+  { name: "Diego Ramos", img: creatorMateus, video: "/videos/shop-8.mp4" },
 ];
 
 const reviewPhotos = [reviewFoto1, reviewFoto2, reviewFoto3, reviewFoto4, reviewFoto5, reviewFoto6, reviewFoto7, reviewFoto8, reviewFoto9, reviewFoto10, reviewFoto11, reviewFoto12, reviewFoto13, reviewFoto14, reviewFoto15, reviewFoto16, reviewFoto17, reviewFoto18, reviewFoto19, reviewFoto20, reviewFoto21, reviewFoto22, reviewFoto23, reviewFoto24, reviewFoto25, reviewFoto26, reviewFoto27, reviewFoto28, reviewFoto29, reviewFoto30, reviewFoto31, reviewFoto32, reviewFoto33, reviewFoto34, reviewFoto35, reviewFoto36, reviewFoto37, reviewFoto38, reviewFoto39, reviewFoto40, reviewFoto41];
@@ -258,7 +262,17 @@ function ProdutoPage() {
         <div className="grid grid-cols-3 gap-2">
           {creators.map((c) => (
             <div key={c.name} className="aspect-[3/4] rounded-lg bg-gray-100 relative overflow-hidden">
-              <img src={c.img} alt={c.name} className="w-full h-full object-cover opacity-90" />
+              <video
+                src={c.video}
+                poster={c.img}
+                muted
+                loop
+                playsInline
+                autoPlay
+                preload="metadata"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
               <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-center gap-1.5">
                 <img src={c.img} alt="" className="w-5 h-5 rounded-full border border-white object-cover" />
                 <span className="text-white text-[10px] font-semibold truncate drop-shadow">{c.name}</span>
