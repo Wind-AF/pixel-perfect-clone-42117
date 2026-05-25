@@ -134,9 +134,9 @@ function CheckoutPage() {
       {/* Footer */}
       <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-40">
         {descontos > 0 && (
-          <div className="bg-rose-50 text-rose-600 text-[13px] text-center py-2 flex items-center justify-center gap-1.5">
-            <Gift className="w-4 h-4" />
-            Você está economizando <strong>R$ {fmt(descontos)}</strong> neste pedido.
+          <div className="bg-rose-50 text-rose-600 text-[13px] text-center py-2 px-3 flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5">
+            <Gift className="w-4 h-4 shrink-0" />
+            <span>Você está economizando <strong>R$ {fmt(descontos)}</strong> neste pedido.</span>
           </div>
         )}
         <div className="max-w-3xl mx-auto px-4 py-2.5 flex items-center justify-between">
