@@ -79,12 +79,13 @@ export type Address = {
   district: string;
   city: string;
   state: string;
-  carrier: "jadlog" | "correios";
+  carrier: "jadlog" | "sedex" | "correios";
 };
 
 const CARRIERS: { id: Address["carrier"]; name: string; price: number; eta: string }[] = [
-  { id: "jadlog", name: "JadLog", price: 25.5, eta: "5 a 8 dias úteis" },
-  { id: "correios", name: "Correios PAC", price: 32.9, eta: "7 a 12 dias úteis" },
+  { id: "jadlog", name: "JadLog", price: 25.5, eta: "Receba em até 2 dias úteis" },
+  { id: "sedex", name: "Sedex-Express", price: 17.5, eta: "Receba em até 4 dias úteis" },
+  { id: "correios", name: "Correio", price: 0, eta: "Receba em até 7 dias úteis" },
 ];
 
 type Bump = {
