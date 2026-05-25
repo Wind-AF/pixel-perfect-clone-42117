@@ -1,18 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import {
-  ChevronLeft,
-  Search,
-  Share2,
-  ShoppingCart,
-  Star,
-  ChevronRight,
-  List,
-  ArrowDownAZ,
-} from "lucide-react";
-import logo from "@/assets/logo.png";
-import album from "@/assets/album.jpg";
-import envelopes from "@/assets/envelopes.jpg";
+import { ChevronLeft, Search, ChevronRight, List, ArrowDownAZ } from "lucide-react";
+import logo from "@/assets/logo.webp";
+import album from "@/assets/album-capa-dura.png";
+import env400 from "@/assets/envelopes-400.png";
+import env650 from "@/assets/envelopes-650.png";
+import bilhete from "@/assets/bilhete.png";
+import carrinho from "@/assets/carrinho.png";
+import compartilhar from "@/assets/compartilhar.png";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -29,19 +24,19 @@ type Product = {
 };
 
 const products: Product[] = [
-  { name: "Kit Com 650 Envelopes", img: envelopes, price: "R$ 62,06", old: "R$ 494,90", discount: "60% OFF", sold: "4312 vendido(s)", rating: "5" },
-  { name: "Kit Com 400 Envelopes", img: envelopes, price: "R$ 43,08", old: "R$ 394,90", discount: "60% OFF", sold: "4312 vendido(s)", rating: "5" },
+  { name: "Kit Com 650 Envelopes", img: env650, price: "R$ 62,06", old: "R$ 494,90", discount: "60% OFF", sold: "4312 vendido(s)", rating: "5" },
+  { name: "Kit Com 400 Envelopes", img: env400, price: "R$ 43,08", old: "R$ 394,90", discount: "60% OFF", sold: "4312 vendido(s)", rating: "5" },
+  { name: "Álbum Capa Dura Prata", img: album, price: "R$ 49,90", old: "R$ 149,90", discount: "60% OFF", sold: "4312 vendido(s)", rating: "5" },
+  { name: "Kit Com 200 Envelopes", img: env400, price: "R$ 29,93", old: "R$ 194,90", discount: "60% OFF", sold: "4312 vendido(s)", rating: "5" },
   { name: "Álbum 2026", img: album, price: "R$ 31,43", old: "R$ 74,90", discount: "60% OFF", sold: "4312 vendido(s)", rating: "5" },
-  { name: "Kit Com 200 Envelopes", img: envelopes, price: "R$ 29,93", old: "R$ 194,90", discount: "60% OFF", sold: "4312 vendido(s)", rating: "5" },
-  { name: "Álbum Dourado Capa Dura", img: album, price: "R$ 49,90", old: "R$ 149,90", discount: "60% OFF", sold: "4312 vendido(s)", rating: "5" },
 ];
 
-const tabs = ["Página inicial", "Produtos", "Categorias"];
-const filters = ["Recomendado", "Mais vendidos", "Lançamentos"];
+const tabs = ["Página inicial", "Produtos", "Categorias"] as const;
+const filters = ["Recomendado", "Mais vendidos", "Lançamentos"] as const;
 
 function Index() {
-  const [activeTab, setActiveTab] = useState("Produtos");
-  const [activeFilter, setActiveFilter] = useState("Recomendado");
+  const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>("Produtos");
+  const [activeFilter, setActiveFilter] = useState<(typeof filters)[number]>("Recomendado");
 
   return (
     <div className="min-h-screen bg-white text-gray-800 text-sm max-w-[500px] mx-auto shadow-sm">
@@ -52,20 +47,22 @@ function Index() {
             <button aria-label="Voltar" className="text-gray-700">
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <div className="relative flex-1 max-w-[220px]">
+            <div className="relative flex-1 max-w-[240px] ml-2">
               <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
               <input
                 type="text"
                 placeholder="Pesquisar"
-                className="bg-gray-100 rounded-full pl-8 pr-3 py-1.5 w-full outline-none text-sm"
+                className="bg-gray-100 rounded pl-8 pr-3 py-1.5 w-full outline-none text-sm"
               />
             </div>
           </div>
-          <div className="flex items-center gap-4 mr-1 text-gray-600">
-            <button aria-label="Compartilhar"><Share2 className="w-5 h-5" /></button>
+          <div className="flex items-center gap-4 mr-1">
+            <button aria-label="Compartilhar">
+              <img src={compartilhar} alt="Compartilhar" width={22} height={22} />
+            </button>
             <button aria-label="Carrinho" className="relative">
-              <ShoppingCart className="w-5 h-5" />
-              <span className="absolute -top-2 -right-2 flex w-4 h-4 bg-rose-600 text-white items-center justify-center rounded-full text-[10px] font-bold">0</span>
+              <img src={carrinho} alt="Carrinho" width={22} height={22} />
+              <span className="absolute -top-2 -right-3 flex w-5 h-5 bg-rose-600 text-white items-center justify-center rounded-full text-[10px] font-bold">0</span>
             </button>
           </div>
         </div>
@@ -75,7 +72,7 @@ function Index() {
       <section className="bg-white">
         <div className="flex justify-between items-center px-4 py-4">
           <div className="flex items-center gap-3">
-            <img src={logo} alt="Logo" width={64} height={64} className="w-16 h-16 rounded-full object-cover border-2 border-transparent" />
+            <img src={logo} alt="Panini" width={64} height={64} className="w-16 h-16 rounded-full object-cover border-2 border-transparent" />
             <div className="flex flex-col leading-tight">
               <h1 className="font-semibold text-base">Album 2026</h1>
               <span className="text-[12px] text-gray-600">99.176 vendido(s)</span>
@@ -89,12 +86,12 @@ function Index() {
 
         {/* Frete promo */}
         <div className="px-4 pb-2">
-          <div className="bg-rose-50/60 border border-rose-100 rounded-xl p-3">
-            <div className="flex items-center justify-center gap-2 text-xs">
-              <span className="text-gray-600">OFERTA TERMINA EM</span>
-              <strong className="bg-gray-900 text-white px-2 py-0.5 rounded-md text-[11px]">19:59</strong>
+          <div className="rounded-2xl p-3 border border-gray-100 shadow-sm" style={{ background: "linear-gradient(180deg,#fff,#fff5f7)" }}>
+            <div className="flex items-center justify-center gap-2 text-[12px] font-bold uppercase tracking-wide text-gray-900">
+              <span>Oferta termina em</span>
+              <strong className="bg-gray-900 text-white px-2.5 py-1 rounded-full text-[12px]">17:35</strong>
             </div>
-            <div className="mt-2 text-[13px] font-semibold text-gray-800">
+            <div className="mt-2 text-[12px] font-semibold text-gray-700">
               Faltam R$ 120,00 para liberar o frete grátis.
             </div>
             <div className="mt-2 h-1.5 bg-rose-100 rounded-full overflow-hidden">
@@ -150,11 +147,11 @@ function Index() {
       {/* Filter bar */}
       <div className="flex items-center px-3 py-2 text-sm border-b border-gray-100">
         <div className="flex flex-1 overflow-x-auto scrollbar-hide">
-          {filters.map((f, i) => (
+          {filters.map((f) => (
             <button
               key={f}
               onClick={() => setActiveFilter(f)}
-              className={`whitespace-nowrap px-3 ${i < filters.length - 1 || true ? "border-r border-gray-200" : ""} ${
+              className={`whitespace-nowrap px-3 border-r border-gray-200 ${
                 activeFilter === f ? "text-black font-semibold" : "text-gray-500"
               }`}
             >
@@ -171,17 +168,18 @@ function Index() {
       </div>
 
       {/* Product list */}
-      <main className="p-3 space-y-3 bg-white">
+      <main className="p-3 space-y-4 bg-white">
         {products.map((p, idx) => (
           <article key={idx} className="w-full bg-white flex flex-row rounded-lg">
             <div className="flex-shrink-0 mr-3 w-[110px] h-[120px]">
               <img src={p.img} alt={p.name} loading="lazy" className="w-full h-full object-contain" />
             </div>
-            <div className="flex flex-col justify-between flex-1 min-w-0 pb-2">
+            <div className="flex flex-col justify-between flex-1 min-w-0 pb-2 min-h-[120px]">
               <div className="flex flex-col gap-1">
                 <h2 className="text-gray-900 text-xs font-semibold truncate">{p.name}</h2>
                 <div className="flex flex-row gap-1 items-center flex-wrap">
-                  <span className="bg-rose-100 text-rose-600 text-[11px] font-bold px-2 py-0.5 rounded">
+                  <span className="bg-rose-100 text-rose-600 text-[11px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
+                    <img src={bilhete} alt="" width={12} height={12} style={{ filter: "brightness(0) saturate(100%) invert(28%) sepia(94%) saturate(2913%) hue-rotate(330deg) brightness(95%) contrast(101%)" }} />
                     {p.discount}
                   </span>
                   <span className="bg-cyan-100 text-cyan-600 text-[11px] font-bold px-2 py-0.5 rounded">
@@ -189,19 +187,23 @@ function Index() {
                   </span>
                 </div>
                 <div className="flex flex-row gap-1 items-center">
-                  <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                  <span className="text-yellow-400 text-xs">★</span>
                   <span className="text-gray-700 text-[11px]">{p.rating} | {p.sold}</span>
                 </div>
               </div>
               <div className="flex items-end justify-between mt-1">
                 <div className="flex flex-col">
-                  <span className="text-rose-600 text-base font-bold leading-tight">{p.price}</span>
+                  <span className="text-rose-500 text-base font-bold leading-tight">{p.price}</span>
                   <span className="text-gray-400 text-xs line-through">{p.old}</span>
                 </div>
-                <button className="bg-rose-600 text-white text-xs font-semibold px-3 py-1.5 rounded-md flex items-center gap-1">
-                  <ShoppingCart className="w-3.5 h-3.5" />
-                  Comprar
-                </button>
+                <div className="flex items-center ml-2">
+                  <button aria-label="Adicionar" className="bg-rose-100 text-rose-600 h-8 px-3 flex items-center justify-center rounded-l-md">
+                    <img src={carrinho} alt="" width={14} height={14} style={{ filter: "brightness(0) saturate(100%) invert(28%) sepia(94%) saturate(2913%) hue-rotate(330deg) brightness(95%) contrast(101%)" }} />
+                  </button>
+                  <button className="bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold h-8 px-3 flex items-center rounded-r-md">
+                    Comprar
+                  </button>
+                </div>
               </div>
             </div>
           </article>
