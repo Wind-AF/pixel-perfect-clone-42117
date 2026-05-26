@@ -1227,7 +1227,22 @@ function StepPix({ customer, totalFinal }: { customer: Customer; totalFinal: num
       {/* Pagamento via Pix */}
       <section className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
         <h3 className="font-bold text-gray-900 text-lg">Pagamento via Pix</h3>
-        <p className="text-sm text-gray-600">Use o QR Code ou copie o código Pix abaixo:</p>
+        <p className="text-sm text-gray-600">Escaneie o QR Code ou copie o código Pix abaixo:</p>
+        <div className="flex justify-center">
+          <div className="p-3 bg-white border border-gray-200 rounded-xl">
+            <img
+              src={
+                pix.pix.qrCode.image
+                  ? (pix.pix.qrCode.image.startsWith("data:")
+                      ? pix.pix.qrCode.image
+                      : `data:image/png;base64,${pix.pix.qrCode.image}`)
+                  : `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=0&data=${encodeURIComponent(emv)}`
+              }
+              alt="QR Code Pix"
+              className="w-60 h-60 object-contain"
+            />
+          </div>
+        </div>
         <div className="rounded-lg border border-gray-200 px-3 py-3 text-xs font-mono text-gray-800 truncate">
           {emv}
         </div>
