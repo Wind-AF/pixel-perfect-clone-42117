@@ -633,10 +633,11 @@ function StepIdentificacao({
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) return setError("E-mail inválido");
-    if (form.phone.replace(/\D/g, "").length < 10) return setError("Telefone inválido");
-    if (form.name.trim().split(" ").length < 2) return setError("Informe nome e sobrenome");
-    if (form.cpf.replace(/\D/g, "").length !== 11) return setError("CPF inválido");
+    if (!isValidEmail(form.email)) return setError("E-mail inválido");
+    if (!isValidPhoneBR(form.phone)) return setError("Telefone inválido");
+    if (form.name.trim().split(/\s+/).filter(Boolean).length < 2)
+      return setError("Informe nome e sobrenome");
+    if (!isValidCPF(form.cpf)) return setError("CPF inválido");
     setError(null);
     onNext(form);
   };
