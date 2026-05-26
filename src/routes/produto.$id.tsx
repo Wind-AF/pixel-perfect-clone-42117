@@ -373,7 +373,7 @@ function ProdutoPage() {
       <section className="px-4 mt-4 py-3 border-y border-gray-100 flex items-center gap-3">
         <div className="w-11 h-11 rounded-full bg-yellow-300 flex items-center justify-center text-[10px] font-black text-red-600 italic shrink-0">PANINI</div>
         <div className="flex-1">
-          <div className="font-bold text-sm">Album 2026</div>
+          <div className="font-bold text-sm">Loja figurinhas</div>
           <div className="text-[11px] text-gray-500">38808 vendido(s)</div>
         </div>
         <button className="px-4 py-1.5 bg-gray-100 text-gray-800 text-xs font-semibold rounded-full">Seguir</button>

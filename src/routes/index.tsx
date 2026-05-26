@@ -174,7 +174,7 @@ function Index() {
           <div className="flex items-center gap-3">
             <img src={logo} alt="Panini" width={64} height={64} className="w-16 h-16 rounded-full object-cover border-2 border-transparent" />
             <div className="flex flex-col leading-tight">
-              <h1 className="font-semibold text-base">Album 2026</h1>
+              <h1 className="font-semibold text-base">Loja figurinhas</h1>
               <span className="text-[12px] text-gray-600">99.176 vendido(s)</span>
             </div>
           </div>
