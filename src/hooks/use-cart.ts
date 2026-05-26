@@ -8,8 +8,9 @@ export type CartItem = {
   qty: number;
 };
 
-const KEY = "cart-v1";
+const KEY = "cart-v2";
 const EVT = "cart-updated";
+const ADD_EVT = "cart-added";
 
 const read = (): CartItem[] => {
   if (typeof window === "undefined") return [];
