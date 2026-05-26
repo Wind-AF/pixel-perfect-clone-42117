@@ -81,6 +81,8 @@ export type Address = {
   carrier: "jadlog" | "sedex" | "correios";
 };
 
+const FREE_SHIPPING_MIN = 120;
+const CORREIO_PAID_PRICE = 9.9;
 const CARRIERS: { id: Address["carrier"]; name: string; price: number; eta: string }[] = [
   { id: "jadlog", name: "JadLog", price: 25.5, eta: "Receba em até 2 dias úteis" },
   { id: "sedex", name: "Sedex-Express", price: 17.5, eta: "Receba em até 4 dias úteis" },
@@ -166,8 +168,13 @@ function CheckoutPage() {
   const timer = useCountdown(5 * 60 * 60 - 7);
   const subtitle = useRotatingSubtitle();
 
-  const carrier = CARRIERS.find((c) => c.id === address.carrier) ?? CARRIERS[0];
   const subtotalItems = total;
+  const carriers = CARRIERS.map((c) =>
+    c.id === "correios"
+      ? { ...c, price: subtotalItems >= FREE_SHIPPING_MIN ? 0 : CORREIO_PAID_PRICE }
+      : c,
+  );
+  const carrier = carriers.find((c) => c.id === address.carrier) ?? carriers[0];
   const oldRealistic = items.reduce((s, i) => {
     const old = parsePrice((i as { old?: string }).old || "");
     return s + (old || parsePrice(i.price) * 8) * i.qty;
