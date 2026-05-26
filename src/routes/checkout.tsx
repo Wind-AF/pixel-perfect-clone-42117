@@ -1030,7 +1030,7 @@ function VariantModal({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="block font-bold text-gray-900 mb-2 text-sm">{label}</span>
+      <span className="font-bold text-gray-900 mb-2 text-sm leading-tight min-h-[40px] flex items-end">{label}</span>
       {children}
     </label>
   );
