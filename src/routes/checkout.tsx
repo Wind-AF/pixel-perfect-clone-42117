@@ -81,6 +81,8 @@ export type Address = {
   carrier: "jadlog" | "sedex" | "correios";
 };
 
+const FREE_SHIPPING_MIN = 120;
+const CORREIO_PAID_PRICE = 9.9;
 const CARRIERS: { id: Address["carrier"]; name: string; price: number; eta: string }[] = [
   { id: "jadlog", name: "JadLog", price: 25.5, eta: "Receba em até 2 dias úteis" },
   { id: "sedex", name: "Sedex-Express", price: 17.5, eta: "Receba em até 4 dias úteis" },
@@ -166,8 +168,13 @@ function CheckoutPage() {
   const timer = useCountdown(5 * 60 * 60 - 7);
   const subtitle = useRotatingSubtitle();
 
-  const carrier = CARRIERS.find((c) => c.id === address.carrier) ?? CARRIERS[0];
   const subtotalItems = total;
+  const carriers = CARRIERS.map((c) =>
+    c.id === "correios"
+      ? { ...c, price: subtotalItems >= FREE_SHIPPING_MIN ? 0 : CORREIO_PAID_PRICE }
+      : c,
+  );
+  const carrier = carriers.find((c) => c.id === address.carrier) ?? carriers[0];
   const oldRealistic = items.reduce((s, i) => {
     const old = parsePrice((i as { old?: string }).old || "");
     return s + (old || parsePrice(i.price) * 8) * i.qty;
@@ -274,6 +281,7 @@ function CheckoutPage() {
         {step === 2 && (
           <StepEntrega
             initial={address}
+            carriers={carriers}
             onNext={(a) => {
               setAddress(a);
               setStep(3);
@@ -700,9 +708,11 @@ function StepIdentificacao({
 
 function StepEntrega({
   initial,
+  carriers,
   onNext,
 }: {
   initial: Address;
+  carriers: { id: Address["carrier"]; name: string; price: number; eta: string }[];
   onNext: (a: Address) => void;
 }) {
   const [form, setForm] = useState<Address>(initial);
@@ -798,7 +808,7 @@ function StepEntrega({
         <div>
           <h3 className="font-bold text-gray-900 text-sm mb-2">Transportadora</h3>
           <div className="space-y-2">
-            {CARRIERS.map((c) => {
+            {carriers.map((c) => {
               const selected = form.carrier === c.id;
               return (
                 <button
@@ -816,7 +826,9 @@ function StepEntrega({
                     <div className="text-xs text-gray-500">{c.eta}</div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-gray-900">R$ {fmt(c.price)}</span>
+                    <span className="text-sm font-bold text-gray-900">
+                      {c.price === 0 ? "Grátis" : `R$ ${fmt(c.price)}`}
+                    </span>
                     <span
                       className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                         selected ? "border-rose-500" : "border-gray-300"
@@ -830,10 +842,13 @@ function StepEntrega({
             })}
           </div>
           {(() => {
-            const sel = CARRIERS.find((c) => c.id === form.carrier) ?? CARRIERS[0];
+            const sel = carriers.find((c) => c.id === form.carrier) ?? carriers[0];
             return (
               <div className="text-xs text-gray-500 mt-2">
-                Frete selecionado: <span className="font-semibold text-gray-700">{sel.name} (R$ {fmt(sel.price)})</span>
+                Frete selecionado:{" "}
+                <span className="font-semibold text-gray-700">
+                  {sel.name} ({sel.price === 0 ? "Grátis" : `R$ ${fmt(sel.price)}`})
+                </span>
               </div>
             );
           })()}
@@ -1030,7 +1045,7 @@ function VariantModal({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="block font-bold text-gray-900 mb-2 text-sm">{label}</span>
+      <span className="font-bold text-gray-900 mb-2 text-sm leading-tight min-h-[40px] flex items-end">{label}</span>
       {children}
     </label>
   );
@@ -1212,7 +1227,22 @@ function StepPix({ customer, totalFinal }: { customer: Customer; totalFinal: num
       {/* Pagamento via Pix */}
       <section className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
         <h3 className="font-bold text-gray-900 text-lg">Pagamento via Pix</h3>
-        <p className="text-sm text-gray-600">Use o QR Code ou copie o código Pix abaixo:</p>
+        <p className="text-sm text-gray-600">Escaneie o QR Code ou copie o código Pix abaixo:</p>
+        <div className="flex justify-center">
+          <div className="p-3 bg-white border border-gray-200 rounded-xl">
+            <img
+              src={
+                pix.pix.qrCode.image
+                  ? (pix.pix.qrCode.image.startsWith("data:")
+                      ? pix.pix.qrCode.image
+                      : `data:image/png;base64,${pix.pix.qrCode.image}`)
+                  : `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=0&data=${encodeURIComponent(emv)}`
+              }
+              alt="QR Code Pix"
+              className="w-60 h-60 object-contain"
+            />
+          </div>
+        </div>
         <div className="rounded-lg border border-gray-200 px-3 py-3 text-xs font-mono text-gray-800 truncate">
           {emv}
         </div>
