@@ -281,6 +281,7 @@ function CheckoutPage() {
         {step === 2 && (
           <StepEntrega
             initial={address}
+            carriers={carriers}
             onNext={(a) => {
               setAddress(a);
               setStep(3);
@@ -707,9 +708,11 @@ function StepIdentificacao({
 
 function StepEntrega({
   initial,
+  carriers,
   onNext,
 }: {
   initial: Address;
+  carriers: { id: Address["carrier"]; name: string; price: number; eta: string }[];
   onNext: (a: Address) => void;
 }) {
   const [form, setForm] = useState<Address>(initial);
