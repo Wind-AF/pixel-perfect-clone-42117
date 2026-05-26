@@ -4,6 +4,7 @@ import { ChevronLeft, Search, ChevronRight, List, ArrowDownAZ, X } from "lucide-
 import logo from "@/assets/logo.webp";
 import bilhete from "@/assets/bilhete.png";
 import carrinho from "@/assets/carrinho.png";
+import popupCartinha from "@/assets/popup-cartinha.png";
 import compartilhar from "@/assets/compartilhar.png";
 import { products } from "@/data/products";
 import { useCart } from "@/hooks/use-cart";
@@ -42,35 +43,96 @@ function Index() {
   return (
     <div className="min-h-screen bg-white text-gray-800 text-sm max-w-[500px] mx-auto shadow-sm">
       {showPopup && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-6" onClick={() => setShowPopup(false)}>
-          <div className="relative w-full max-w-[340px]" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-[99999] flex items-center justify-center"
+          style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(1.5px)" }}
+          onClick={() => setShowPopup(false)}
+        >
+          <div
+            className="relative w-[92vw] max-w-[400px] rounded-[22px] overflow-hidden flex flex-col items-center bg-transparent"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               aria-label="Fechar"
               onClick={() => setShowPopup(false)}
-              className="absolute -top-10 right-0 text-rose-500"
+              className="absolute top-2 right-2 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-black/20 text-white"
             >
-              <X className="w-7 h-7" strokeWidth={3} />
+              <X className="w-4 h-4" strokeWidth={3} />
             </button>
-            <h2 className="text-center text-yellow-400 font-extrabold text-xl tracking-wide mb-3" style={{ textShadow: "1px 1px 0 rgba(0,0,0,0.15)" }}>
-              COMECE COLECIONANDO
-            </h2>
-            <div className="bg-rose-500 rounded-2xl p-1.5 shadow-xl">
-              <div className="bg-white rounded-xl px-6 pt-7 pb-6 text-center">
-                <div className="text-5xl font-extrabold text-gray-900 leading-none">70% OFF</div>
-                <div className="text-rose-500 font-semibold mt-3 text-base">no seu pedido!</div>
-                <p className="text-gray-700 text-sm mt-5 leading-snug">
-                  Você pode começar o ano<br />com um novo hobby.
-                </p>
-                <p className="text-gray-700 text-sm mt-3 leading-snug">
-                  Aproveita: Albuns estão com 70% OFF.
-                </p>
+            <img src={popupCartinha} alt="" className="block w-full h-auto select-none" draggable={false} />
+            <div className="absolute inset-0 flex flex-col items-center pointer-events-none pt-14 pb-6 gap-3">
+              <div className="absolute top-[14px] left-0 w-full flex justify-center">
+                <span
+                  className="font-black text-[1.05rem] tracking-wide"
+                  style={{
+                    background: "linear-gradient(90deg,#ffd700,#fffbe6)",
+                    WebkitBackgroundClip: "text",
+                    backgroundClip: "text",
+                    color: "transparent",
+                    textShadow: "0 2px 8px rgba(0,0,0,0.2)",
+                  }}
+                >
+                  COMECE COLECIONANDO
+                </span>
               </div>
-              <div className="text-center text-white font-bold py-3 text-sm">
+              <div
+                className="mt-[18px] font-black leading-[1.1]"
+                style={{ fontSize: "2.1rem", letterSpacing: "1px", color: "#222", textShadow: "0 2px 8px #fff" }}
+              >
+                70% OFF
+              </div>
+              <div
+                className="font-bold"
+                style={{ fontSize: "1.1rem", margin: "8px 0 0 0", color: "#fe2d55", textShadow: "0 2px 8px #fff" }}
+              >
+                no seu pedido!
+              </div>
+              <div
+                className="mx-auto mt-2.5 text-center"
+                style={{
+                  fontSize: "0.95rem",
+                  color: "#333",
+                  textShadow: "0 2px 8px #fff",
+                  lineHeight: 1.45,
+                  maxWidth: "68%",
+                  padding: "0 6px",
+                  wordBreak: "break-word",
+                }}
+              >
+                <span className="block">Você pode começar o ano</span>
+                <span className="block">com um novo hobby.</span>
+                <span className="block mt-1.5" style={{ fontSize: "0.93em", opacity: 0.9 }}>
+                  Aproveita: Albuns estão com 70% OFF.
+                </span>
+              </div>
+              <div
+                className="font-semibold text-white"
+                style={{
+                  fontSize: "1.1rem",
+                  background: "#fe2d55cc",
+                  borderRadius: "8px",
+                  padding: "6px 18px",
+                  margin: "18px 0 0 0",
+                  boxShadow: "0 2px 8px #0002",
+                }}
+              >
                 Termina em {pad(countdown.h)}:{pad(countdown.m)}:{pad(countdown.s)}
               </div>
               <button
                 onClick={() => setShowPopup(false)}
-                className="w-full bg-white text-rose-500 font-bold py-3 rounded-b-xl text-base"
+                className="pointer-events-auto"
+                style={{
+                  margin: "18px 0 0 0",
+                  background: "#fff",
+                  color: "#fe2d55",
+                  fontWeight: 900,
+                  fontSize: "1.08rem",
+                  padding: "10px 34px",
+                  border: "none",
+                  borderRadius: "28px",
+                  boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+                  letterSpacing: "0.4px",
+                }}
               >
                 Resgatar agora
               </button>
