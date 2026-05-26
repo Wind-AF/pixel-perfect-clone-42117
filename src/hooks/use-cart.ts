@@ -50,6 +50,9 @@ export function useCart() {
       current.push({ ...item, qty });
     }
     write(current);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event(ADD_EVT));
+    }
   };
 
   const removeItem = (id: string) => {
