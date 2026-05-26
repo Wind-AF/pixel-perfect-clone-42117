@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { X, Maximize2, Check } from "lucide-react";
-import { toast } from "sonner";
+import { X, Maximize2 } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import type { Product } from "@/data/products";
 
@@ -20,10 +19,6 @@ export function BuyDrawer({
 
   const handleBuy = () => {
     addItem({ id: product.id, name: product.name, img: product.img, price: product.price }, qty);
-    toast.success("Adicionado ao carrinho", {
-      icon: <Check className="w-4 h-4 text-emerald-500" />,
-      duration: 1800,
-    });
     setQty(1);
     onClose();
   };
