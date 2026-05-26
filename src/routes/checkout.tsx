@@ -808,7 +808,7 @@ function StepEntrega({
         <div>
           <h3 className="font-bold text-gray-900 text-sm mb-2">Transportadora</h3>
           <div className="space-y-2">
-            {CARRIERS.map((c) => {
+            {carriers.map((c) => {
               const selected = form.carrier === c.id;
               return (
                 <button
@@ -826,7 +826,9 @@ function StepEntrega({
                     <div className="text-xs text-gray-500">{c.eta}</div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-gray-900">R$ {fmt(c.price)}</span>
+                    <span className="text-sm font-bold text-gray-900">
+                      {c.price === 0 ? "Grátis" : `R$ ${fmt(c.price)}`}
+                    </span>
                     <span
                       className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                         selected ? "border-rose-500" : "border-gray-300"
@@ -840,10 +842,13 @@ function StepEntrega({
             })}
           </div>
           {(() => {
-            const sel = CARRIERS.find((c) => c.id === form.carrier) ?? CARRIERS[0];
+            const sel = carriers.find((c) => c.id === form.carrier) ?? carriers[0];
             return (
               <div className="text-xs text-gray-500 mt-2">
-                Frete selecionado: <span className="font-semibold text-gray-700">{sel.name} (R$ {fmt(sel.price)})</span>
+                Frete selecionado:{" "}
+                <span className="font-semibold text-gray-700">
+                  {sel.name} ({sel.price === 0 ? "Grátis" : `R$ ${fmt(sel.price)}`})
+                </span>
               </div>
             );
           })()}
