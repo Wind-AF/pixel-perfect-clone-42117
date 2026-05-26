@@ -605,7 +605,55 @@ function Row({
   );
 }
 
+/* ---------- Validators ---------- */
+
+const VALID_DDDS = new Set([
+  11,12,13,14,15,16,17,18,19,
+  21,22,24,27,28,
+  31,32,33,34,35,37,38,
+  41,42,43,44,45,46,47,48,49,
+  51,53,54,55,
+  61,62,63,64,65,66,67,68,69,
+  71,73,74,75,77,79,
+  81,82,83,84,85,86,87,88,89,
+  91,92,93,94,95,96,97,98,99,
+]);
+
+function isValidEmail(v: string) {
+  const s = v.trim().toLowerCase();
+  if (s.length < 5 || s.length > 255) return false;
+  return /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(s);
+}
+
+function isValidPhoneBR(v: string) {
+  const d = v.replace(/\D/g, "");
+  if (d.length !== 10 && d.length !== 11) return false;
+  const ddd = Number(d.slice(0, 2));
+  if (!VALID_DDDS.has(ddd)) return false;
+  if (d.length === 11 && d[2] !== "9") return false;
+  if (/^(\d)\1+$/.test(d.slice(2))) return false;
+  return true;
+}
+
+function isValidCPF(v: string) {
+  const c = v.replace(/\D/g, "");
+  if (c.length !== 11) return false;
+  if (/^(\d)\1{10}$/.test(c)) return false;
+  let s = 0;
+  for (let i = 0; i < 9; i++) s += Number(c[i]) * (10 - i);
+  let d1 = (s * 10) % 11;
+  if (d1 === 10) d1 = 0;
+  if (d1 !== Number(c[9])) return false;
+  s = 0;
+  for (let i = 0; i < 10; i++) s += Number(c[i]) * (11 - i);
+  let d2 = (s * 10) % 11;
+  if (d2 === 10) d2 = 0;
+  return d2 === Number(c[10]);
+}
+
 /* ---------- Step 1: Identificação ---------- */
+
+
 
 function StepIdentificacao({
   initial,
@@ -633,10 +681,11 @@ function StepIdentificacao({
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) return setError("E-mail inválido");
-    if (form.phone.replace(/\D/g, "").length < 10) return setError("Telefone inválido");
-    if (form.name.trim().split(" ").length < 2) return setError("Informe nome e sobrenome");
-    if (form.cpf.replace(/\D/g, "").length !== 11) return setError("CPF inválido");
+    if (!isValidEmail(form.email)) return setError("E-mail inválido");
+    if (!isValidPhoneBR(form.phone)) return setError("Telefone inválido");
+    if (form.name.trim().split(/\s+/).filter(Boolean).length < 2)
+      return setError("Informe nome e sobrenome");
+    if (!isValidCPF(form.cpf)) return setError("CPF inválido");
     setError(null);
     onNext(form);
   };
